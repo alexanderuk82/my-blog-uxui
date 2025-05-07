@@ -1,0 +1,26 @@
+# Git Flow Configuration
+
+## Branch Naming Convention
+
+- Main development branch: `develop`
+- Production branch: `main` (will be created when ready for first release)
+- Feature branches: `feature/*` (e.g., feature/blog-list, feature/authentication)
+- Release branches: `release/*` (e.g., release/1.0.0)
+- Hotfix branches: `hotfix/*` (e.g., hotfix/login-bug)
+
+## Workflow
+
+1. All development work happens on `develop` branch
+2. For new features, create a branch from `develop` with prefix `feature/`
+3. When feature is complete, merge back to `develop` via Pull Request
+4. For releases, create a branch from `develop` with prefix `release/`
+5. For urgent fixes on production, create a branch from `main` with prefix `hotfix/`
+
+## Environment Variables
+
+This project uses different environment variables for:
+- Local development
+- Staging
+- Production
+
+Refer to the documentation for specific environment setup instructions.
