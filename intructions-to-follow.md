@@ -1,0 +1,206 @@
+GUÍA DE DESARROLLO: BLOG UI/UX + E-COMMERCE
+
+## OBJETIVOS DEL PROYECTO
+
+Crear una plataforma que combine:
+
+1. Blog profesional enfocado en UI/UX y Frontend
+2. Tienda de recursos digitales (wireframes, componentes, templates)
+3. Panel de administración completo
+
+## STACK TECNOLÓGICO
+
+### Frontend
+
+- React 18+ (sin TypeScript)
+- Tailwind CSS para estilos
+- Shadcn UI (componentes modernos y personalizables)
+- Framer Motion (animaciones avanzadas)
+- React Router para navegación
+- React Query para gestión de datos
+- TipTap para editor de texto enriquecido
+- React Helmet para SEO
+- Stripe Elements para procesamiento de pagos
+
+### Backend
+
+- Strapi como CMS Headless
+- PostgreSQL como base de datos
+- Cloudinary para gestión de medios
+- JWT para autenticación
+
+### Despliegue
+
+- Frontend: Netlify
+- Backend: Railway o Digital Ocean
+- CDN: Cloudflare
+
+## ESTRUCTURA DE CARPETAS
+
+```
+src/
+├── components/           # Componentes reutilizables
+│   ├── blog/            # Componentes específicos del blog
+│   ├── shop/            # Componentes específicos de la tienda
+│   ├── admin/           # Componentes del panel de administración
+│   └── common/          # Componentes compartidos
+├── pages/               # Páginas principales
+│   ├── Blog.jsx         # Página principal del blog
+│   ├── BlogPost.jsx     # Página de artículo individual
+│   ├── Shop.jsx         # Página principal de la tienda
+│   ├── Product.jsx      # Página de producto individual
+│   └── admin/           # Páginas del panel de administración
+├── hooks/               # Custom hooks
+│   ├── useAuth.js       # Hook para autenticación
+│   ├── useBlog.js       # Hook para operaciones del blog
+│   └── useShop.js       # Hook para operaciones de la tienda
+├── context/             # Contextos de React
+│   ├── AuthContext.js   # Contexto de autenticación
+│   └── CartContext.js   # Contexto del carrito de compras
+├── services/            # Servicios de API
+│   ├── api.js           # Configuración base de axios
+│   ├── blog.js          # Servicios para el blog
+│   └── shop.js          # Servicios para la tienda
+└── utils/               # Utilidades
+    ├── formatters.js    # Funciones de formato
+    └── validators.js    # Funciones de validación
+```
+
+## ROADMAP DE DESARROLLO
+
+### Fase 1: Configuración Base
+
+1. Iniciar proyecto React con Create React App
+2. Configurar Tailwind CSS
+3. Configurar React Router
+4. Configurar React Query
+5. Instalar dependencias principales
+6. Crear estructura básica de carpetas
+7. Configurar ESLint y Prettier
+
+### Fase 2: Configuración de Strapi
+
+1. Iniciar proyecto Strapi
+2. Crear modelos de datos para Blog
+3. Crear modelos de datos para Shop
+4. Configurar roles y permisos
+5. Configurar endpoints de API
+6. Configurar subida de medios
+
+### Fase 3: Desarrollo Frontend - Blog
+
+1. Crear página de listado de posts
+2. Crear página de post individual
+3. Implementar sistema de comentarios
+4. Implementar categorías y tags
+5. Implementar búsqueda
+6. Optimizar SEO
+
+### Fase 4: Desarrollo Frontend - Shop
+
+1. Crear página de listado de productos
+2. Crear página de producto individual
+3. Implementar carrito de compras
+4. Integrar Stripe para pagos
+5. Implementar sistema de descargas
+6. Implementar biblioteca de usuario
+
+### Fase 5: Panel de Administración
+
+1. Crear dashboard
+2. Implementar CRUD de posts
+3. Implementar CRUD de productos
+4. Implementar gestión de comentarios
+5. Implementar estadísticas
+6. Implementar gestión de usuarios
+
+### Fase 6: Seguridad y Optimización
+
+1. Implementar JWT para autenticación
+2. Configurar CSRF protection
+3. Implementar sanitización de inputs
+4. Configurar rate limiting
+5. Optimizar rendimiento (code splitting, lazy loading)
+6. Implementar estrategia de caché
+
+### Fase 7: Despliegue
+
+1. Configurar variables de entorno
+2. Configurar CI/CD
+3. Desplegar Strapi en Railway/Digital Ocean
+4. Desplegar React en Netlify
+5. Configurar dominio personalizado
+6. Configurar Cloudflare CDN
+
+## IMPLEMENTACIÓN SEO
+
+1. Metadatos dinámicos con React Helmet
+
+   - Títulos únicos para cada página
+   - Descripciones meta
+   - Open Graph tags
+
+2. Renderizado de contenido HTML
+
+   - Usar DOMPurify para sanitizar HTML
+   - Mantener estructura semántica
+
+3. Optimización técnica
+   - Optimización de imágenes
+   - Lazy loading
+   - Core Web Vitals
+
+## SEGURIDAD
+
+1. Autenticación
+
+   - JWT para sesiones
+   - Refresh tokens
+   - Almacenamiento seguro
+
+2. Datos de entrada
+
+   - Validación en frontend y backend
+   - Sanitización con DOMPurify
+   - Escape de caracteres especiales
+
+3. Protección contra ataques
+   - CSRF tokens
+   - Rate limiting
+   - Content Security Policy
+   - XSS protection
+   - Secure headers
+
+## CONTROL DE CALIDAD
+
+1. Linting y Formato
+
+   - ESLint con reglas estrictas
+   - Prettier para formato consistente
+   - Husky para pre-commit hooks
+
+2. Testing
+
+   - Jest para tests unitarios
+   - React Testing Library para tests de componentes
+   - Cypress para tests E2E
+
+3. Performance
+   - Lighthouse audits
+   - Bundle analysis
+   - Monitoreo de performance
+
+## NOTAS IMPORTANTES
+
+- Todo el código debe estar en inglés (variables, comentarios, etc.)
+- La comunicación puede seguir en español
+- Enfocarse en UI moderna y minimalista
+- Priorizar rendimiento y SEO
+- Establecer buenas prácticas de seguridad
+- Documentar código importante
+- Revisar siempre estas instrucciones antes de crear cualquier componente o
+  funcionalidad
+- Todo el código debe adherirse estrictamente a las reglas y estándares
+  establecidos en este documento
+- No desviarse de la estructura de carpetas definida
+- Mantener coherencia en el estilo de codificación en todo el proyecto
