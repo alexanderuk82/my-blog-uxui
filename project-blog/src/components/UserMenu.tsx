@@ -28,42 +28,58 @@ const UserMenu: React.FC<UserMenuProps> = ({
       const anchorRect = anchorRef.current.getBoundingClientRect();
       const menuWidth = 280; // Width of the menu in pixels
       const viewportWidth = window.innerWidth;
+      const isMobile = viewportWidth < 768; // Detectar si es dispositivo móvil
       
-      // Calculate vertical position
-      const topPosition = anchorRect.bottom + window.scrollY;
-      
-      // Calculate horizontal position with boundary checks
-      let leftPosition;
-      
-      // Check if menu would overflow right edge
-      if (anchorRect.left + menuWidth > viewportWidth) {
-        // Align to right edge of anchor with padding
-        leftPosition = anchorRect.right - menuWidth;
-      } 
-      // Check if menu would overflow left edge
-      else if (anchorRect.left < 0) {
-        // Align to left edge of viewport with padding
-        leftPosition = 10;
-      } 
-      // Default: center align with anchor
-      else {
-        // Center the menu on the anchor
-        leftPosition = anchorRect.left + (anchorRect.width / 2) - (menuWidth / 2);
+      // En dispositivos móviles, posicionar el menú de manera diferente
+      if (isMobile) {
+        // Posicionar el menú centrado horizontalmente en la pantalla
+        const leftPosition = Math.max(10, (viewportWidth - menuWidth) / 2);
         
-        // Make sure it doesn't go off screen
-        if (leftPosition + menuWidth > viewportWidth) {
-          leftPosition = viewportWidth - menuWidth - 10;
-        }
-        if (leftPosition < 10) {
+        // Posicionar verticalmente debajo del header
+        const topPosition = anchorRect.bottom + window.scrollY + 10;
+        
+        setMenuPosition({
+          top: topPosition,
+          left: leftPosition
+        });
+      } else {
+        // Comportamiento normal para desktop
+        // Calculate vertical position
+        const topPosition = anchorRect.bottom + window.scrollY;
+        
+        // Calculate horizontal position with boundary checks
+        let leftPosition;
+        
+        // Check if menu would overflow right edge
+        if (anchorRect.left + menuWidth > viewportWidth) {
+          // Align to right edge of anchor with padding
+          leftPosition = anchorRect.right - menuWidth;
+        } 
+        // Check if menu would overflow left edge
+        else if (anchorRect.left < 0) {
+          // Align to left edge of viewport with padding
           leftPosition = 10;
+        } 
+        // Default: center align with anchor
+        else {
+          // Center the menu on the anchor
+          leftPosition = anchorRect.left + (anchorRect.width / 2) - (menuWidth / 2);
+          
+          // Make sure it doesn't go off screen
+          if (leftPosition + menuWidth > viewportWidth) {
+            leftPosition = viewportWidth - menuWidth - 10;
+          }
+          if (leftPosition < 10) {
+            leftPosition = 10;
+          }
         }
+        
+        // Update position
+        setMenuPosition({
+          top: topPosition,
+          left: leftPosition
+        });
       }
-      
-      // Update position
-      setMenuPosition({
-        top: topPosition,
-        left: leftPosition
-      });
     }
   }, [isOpen, anchorRef]);
   
@@ -108,7 +124,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
   return createPortal(
     <div
       ref={menuRef}
-      className="fixed z-50 w-[280px] bg-white dark:bg-black rounded-lg shadow-lg py-2 border border-keyline"
+      className="fixed z-50 w-[280px] bg-white dark:bg-black rounded-lg shadow-lg py-2 border border-keyline transform-gpu"
       style={{
         top: `${menuPosition.top}px`,
         left: `${menuPosition.left}px`,

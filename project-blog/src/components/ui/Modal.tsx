@@ -29,7 +29,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, icon, children })
           </button>
         </div>
 
-        <div className="p-4 max-h-[60vh] overflow-y-auto">
+        <div className="p-4 max-h-[80vh] overflow-y-auto">
           {children}
         </div>
       </div>
