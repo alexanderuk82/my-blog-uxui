@@ -1,30 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Sun, Moon } from 'lucide-react';
 
+// Helper function to get the initial theme
+const getInitialTheme = (): boolean => {
+  if (typeof window === 'undefined') {
+    return false; // Default to light theme for SSR or build time
+  }
+  try {
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme) {
+      return storedTheme === 'dark';
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  } catch (error) {
+    console.error("Error reading theme from localStorage:", error);
+    return false; // Fallback to light theme
+  }
+};
+
 const ThemeToggle: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  
+  // Initialize state directly with the theme preference
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(getInitialTheme());
+
+  // Effect to apply theme class to HTML element and update localStorage
   useEffect(() => {
-    // Check initial preference
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setIsDarkMode(prefersDark);
-    
-    if (prefersDark) {
-      document.documentElement.classList.add('dark');
+    if (typeof window === 'undefined') {
+      return;
     }
+    try {
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    } catch (error) {
+      console.error("Error setting theme:", error);
+    }
+  }, [isDarkMode]); // Re-run effect when isDarkMode changes
+
+  const toggleDarkMode = useCallback(() => {
+    setIsDarkMode(prevMode => !prevMode);
   }, []);
-  
-  const toggleDarkMode = () => {
-    if (isDarkMode) {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
-    setIsDarkMode(!isDarkMode);
-  };
 
   return (
-    <button 
+    <button
       onClick={toggleDarkMode}
       className="p-2 rounded-full hover:bg-surface transition-colors"
       aria-label="Toggle dark mode"
