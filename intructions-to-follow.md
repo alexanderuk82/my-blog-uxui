@@ -24,10 +24,12 @@ Crear una plataforma que combine:
 
 ### Backend
 
-- Strapi como CMS Headless
-- PostgreSQL como base de datos
-- Cloudinary para gestión de medios
-- JWT para autenticación
+- Supabase como backend principal
+  - PostgreSQL integrado
+  - Storage para medios
+  - API en tiempo real
+- Firebase Authentication
+- Cloudinary para gestión de medios avanzada
 
 ### Despliegue
 
@@ -78,14 +80,14 @@ src/
 6. Crear estructura básica de carpetas
 7. Configurar ESLint y Prettier
 
-### Fase 2: Configuración de Strapi
+### Fase 2: Configuración de Supabase y Firebase
 
-1. Iniciar proyecto Strapi
-2. Crear modelos de datos para Blog
-3. Crear modelos de datos para Shop
-4. Configurar roles y permisos
-5. Configurar endpoints de API
-6. Configurar subida de medios
+1. Iniciar proyecto Supabase
+2. Configurar Firebase Authentication
+3. Diseñar y crear tablas en Supabase
+4. Configurar políticas de seguridad RLS
+5. Configurar bucket de almacenamiento
+6. Configurar webhooks y funciones edge
 
 ### Fase 3: Desarrollo Frontend - Blog
 
@@ -116,18 +118,18 @@ src/
 
 ### Fase 6: Seguridad y Optimización
 
-1. Implementar JWT para autenticación
-2. Configurar CSRF protection
+1. Configurar Firebase Authentication Rules
+2. Implementar Row Level Security en Supabase
 3. Implementar sanitización de inputs
-4. Configurar rate limiting
+4. Configurar rate limiting con Supabase Edge Functions
 5. Optimizar rendimiento (code splitting, lazy loading)
-6. Implementar estrategia de caché
+6. Implementar estrategia de caché con Supabase
 
 ### Fase 7: Despliegue
 
 1. Configurar variables de entorno
-2. Configurar CI/CD
-3. Desplegar Strapi en Railway/Digital Ocean
+2. Configurar CI/CD en Netlify
+3. Configurar proyecto Supabase en producción
 4. Desplegar React en Netlify
 5. Configurar dominio personalizado
 6. Configurar Cloudflare CDN
