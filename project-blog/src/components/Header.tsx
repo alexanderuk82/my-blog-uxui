@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
-import { Sun, Moon, ShoppingCart, User, LogOut } from 'lucide-react';
+import { ShoppingCart, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { CartItem } from '../types';
 import Login from './auth/Login';
+import ThemeToggle from './ThemeToggle';
+import UserMenu from './UserMenu';
 
 interface HeaderProps {
   cartItems: CartItem[];
@@ -12,10 +14,11 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Eliminamos el estado isDarkMode ya que ahora lo maneja ThemeToggle
   const [currentTime, setCurrentTime] = useState('');
   const { currentUser, logOut } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const userButtonRef = useRef<HTMLButtonElement>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -36,14 +39,10 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
     return () => clearInterval(interval);
   }, []);
   
-  const toggleDarkMode = () => {
-    if (isDarkMode) {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
-    setIsDarkMode(!isDarkMode);
-  };
+  // No necesitamos manejar el clic fuera del menú ni el resize aquí
+  // ya que ahora lo maneja el componente UserMenu
+  
+  // La funcionalidad de toggleDarkMode ahora está en el componente ThemeToggle
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -109,14 +108,7 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
               />
               
               <div className="flex items-center gap-4 mt-4 md:mt-0" role="group" aria-label="User actions">
-                <button 
-                  onClick={toggleDarkMode}
-                  className="p-2 rounded-full hover:bg-surface transition-colors focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none"
-                  aria-label={isDarkMode ? 'Enable light mode' : 'Enable dark mode'}
-                  aria-pressed={isDarkMode}
-                >
-                  {isDarkMode ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
-                </button>
+                <ThemeToggle />
                 <button
                   onClick={onCartClick}
                   className="p-2 rounded-full hover:bg-surface transition-colors relative focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none"
@@ -132,6 +124,7 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
                 </button>
                 <div className="relative">
                   <button
+                    ref={userButtonRef}
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className="p-2 rounded-full hover:bg-surface transition-colors relative focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none"
                     aria-label={currentUser ? `User menu: ${currentUser.email}` : 'Sign in menu'}
@@ -147,54 +140,18 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
                       <User size={18} aria-hidden="true" />
                     )}
                   </button>
-                  {showUserMenu && (
-                    <div 
-                      className="absolute left-1/2 -translate-x-1/2 mt-2 w-[280px] bg-white dark:bg-black rounded-lg shadow-lg py-2 border border-keyline z-50" 
-                      role="menu" 
-                      aria-orientation="vertical"
-                      aria-label="User menu"
-                      data-testid="user-menu-dropdown"
-                    >
-                      {currentUser ? (
-                        <>
-                          <div className="px-4 py-2 text-sm border-b border-keyline">
-                            {currentUser.email}
-                          </div>
-                          <button
-                            onClick={logOut}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-surface focus:bg-surface focus:outline-none transition-colors flex items-center gap-2"
-                            role="menuitem"
-                          >
-                            <LogOut size={16} aria-hidden="true" />
-                            <span>Sign Out</span>
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => {
-                              setShowLoginModal(true);
-                              setShowUserMenu(false);
-                            }}
-                            className="block w-full text-left px-4 py-2 text-sm hover:bg-surface focus:bg-surface focus:outline-none transition-colors"
-                            role="menuitem"
-                          >
-                            <span>Sign In</span>
-                          </button>
-                          <button
-                            onClick={() => {
-                              // TODO: Implement registration
-                              setShowUserMenu(false);
-                            }}
-                            className="block w-full text-left px-4 py-2 text-sm hover:bg-surface focus:bg-surface focus:outline-none transition-colors"
-                            role="menuitem"
-                          >
-                            <span>Register</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )}
+                  
+                  <UserMenu 
+                    isOpen={showUserMenu}
+                    onClose={() => setShowUserMenu(false)}
+                    anchorRef={userButtonRef}
+                    currentUser={currentUser}
+                    onLoginClick={() => {
+                      setShowLoginModal(true);
+                      setShowUserMenu(false);
+                    }}
+                    onLogoutClick={logOut}
+                  />
                 </div>
               </div>
             </div>
