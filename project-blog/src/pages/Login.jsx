@@ -20,11 +20,24 @@ const Login = () => {
   
   const handleGoogleLogin = async () => {
     try {
+      console.log('Starting Google sign in...');
+      // Set a flag in localStorage to indicate we're attempting login
+      localStorage.setItem('auth_in_progress', 'true');
+      
       await signInWithGoogle();
+      
+      // Clear the flag after successful login
+      localStorage.removeItem('auth_in_progress');
+      
+      console.log('Successfully signed in');
       toast.success('Successfully signed in');
       navigate('/');
     } catch (error) {
+      // Clear the flag if there's an error
+      localStorage.removeItem('auth_in_progress');
+      
       console.error('Login error:', error);
+      console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
       toast.error('Failed to sign in: ' + error.message);
     }
   };
