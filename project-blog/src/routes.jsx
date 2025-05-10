@@ -1,10 +1,14 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { SeoProvider } from './context/SeoContext';
+import { HelmetProvider } from 'react-helmet-async';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import App from './App';
 import SupabaseTest from './pages/SupabaseTest';
 import Login from './pages/Login';
+import BlogPage from './pages/BlogPage';
+import BlogPostPage from './pages/BlogPostPage';
 
 /**
  * Application routes configuration
@@ -12,18 +16,24 @@ import Login from './pages/Login';
  */
 const AppRoutes = () => {
   return (
-    <AuthProvider>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/supabase-test" element={
-          <ProtectedRoute adminOnly={true}>
-            <SupabaseTest />
-          </ProtectedRoute>
-        } />
-        <Route path="/login" element={<Login />} />
-        {/* Add more routes here as needed */}
-      </Routes>
-    </AuthProvider>
+    <HelmetProvider>
+      <SeoProvider>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/supabase-test" element={
+              <ProtectedRoute adminOnly={true}>
+                <SupabaseTest />
+              </ProtectedRoute>
+            } />
+            <Route path="/login" element={<Login />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
+            {/* Add more routes here as needed */}
+          </Routes>
+        </AuthProvider>
+      </SeoProvider>
+    </HelmetProvider>
   );
 };
 
