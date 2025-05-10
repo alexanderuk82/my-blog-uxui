@@ -14,6 +14,11 @@ export interface BlogPost {
   readTime: string;
   excerpt: string;
   slug: string;
+  image?: string;
+  author?: {
+    name: string;
+    avatar?: string;
+  };
 }
 
 export interface CartItem {
