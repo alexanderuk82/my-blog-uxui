@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
   const adminEmails = ['alexanderburgosuk82@gmail.com']; // Añade aquí tu correo electrónico
   
   // Verificar si el usuario actual tiene acceso de administrador
-  const isAdmin = currentUser && adminEmails.includes(currentUser.email || '');
+  const isAdmin = currentUser ? adminEmails.includes(currentUser.email || '') : false;
 
   useEffect(() => {
     const updateTime = () => {
@@ -191,6 +191,7 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
             <MobileMenu
               isOpen={isMobileMenuOpen}
               onClose={() => setIsMobileMenuOpen(false)}
+              isAdmin={isAdmin}
             />
           </div>
         </div>

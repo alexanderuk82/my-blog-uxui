@@ -1,14 +1,16 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { ShieldCheck } from 'lucide-react';
 
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  isAdmin?: boolean;
 }
 
-const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
+const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, isAdmin = false }) => {
   const menuVariants = {
     closed: {
       x: '100%',
@@ -106,6 +108,23 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
                       </Link>
                     </motion.li>
                   ))}
+                  
+                  {isAdmin && (
+                    <motion.li
+                      custom={menuItems.length}
+                      variants={linkVariants}
+                      className="border-b border-gray-100 dark:border-gray-800"
+                    >
+                      <Link
+                        to="/admin"
+                        onClick={onClose}
+                        className="flex items-center py-3 text-lg font-medium text-gray-800 dark:text-gray-200 hover:text-black dark:hover:text-white transition-colors"
+                      >
+                        <ShieldCheck className="mr-2 h-5 w-5 text-emerald-500" />
+                        Admin Panel
+                      </Link>
+                    </motion.li>
+                  )}
                 </ul>
               </nav>
             </div>
