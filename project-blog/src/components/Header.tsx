@@ -133,11 +133,11 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
                     data-testid="user-menu-button"
                   >
                     {currentUser ? (
-                      <div className="w-8 h-8 rounded-full bg-black text-white dark:bg-white dark:text-black flex items-center justify-center text-sm font-medium" aria-hidden="true">
+                      <div className="w-10 h-10 rounded-full bg-black text-white dark:bg-white dark:text-black flex items-center justify-center text-sm font-medium" aria-hidden="true">
                         {currentUser.email?.[0].toUpperCase()}
                       </div>
                     ) : (
-                      <User size={18} aria-hidden="true" />
+                      <User  aria-hidden="true" />
                     )}
                   </button>
                   
