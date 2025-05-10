@@ -180,7 +180,7 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
                     }}
                     onLogoutClick={() => {
                       logOut();
-                      toast.success('Sesión cerrada correctamente');
+                      toast.success('Logged out successfully');
                     }}
                   />
                 </div>

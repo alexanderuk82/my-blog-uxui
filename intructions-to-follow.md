@@ -70,33 +70,48 @@ src/
 
 ## ROADMAP DE DESARROLLO
 
-### Fase 1: Configuración Base
+### Fase 1: Configuración Base ✅
 
-1. Iniciar proyecto React con Create React App
-2. Configurar Tailwind CSS
-3. Configurar React Router
-4. Configurar React Query
-5. Instalar dependencias principales
-6. Crear estructura básica de carpetas
-7. Configurar ESLint y Prettier
+1. ✅ Iniciar proyecto React con Create React App
+2. ✅ Configurar Tailwind CSS
+3. ✅ Configurar React Router
+4. ✅ Configurar React Query
+5. ✅ Instalar dependencias principales
+6. ✅ Crear estructura básica de carpetas
+7. ✅ Configurar ESLint y Prettier
 
-### Fase 2: Configuración de Supabase y Firebase
+### Fase 2: Configuración de Supabase y Firebase ✅
 
-1. Iniciar proyecto Supabase
-2. Configurar Firebase Authentication
-3. Diseñar y crear tablas en Supabase
-4. Configurar políticas de seguridad RLS
-5. Configurar bucket de almacenamiento
-6. Configurar webhooks y funciones edge
+1. ✅ Iniciar proyecto Supabase
+2. ✅ Configurar Firebase Authentication
+3. ✅ Diseñar y crear tablas en Supabase
+4. ✅ Configurar políticas de seguridad RLS
+5. ⏳ Configurar bucket de almacenamiento
+6. ⏳ Configurar webhooks y funciones edge
 
-### Fase 3: Desarrollo Frontend - Blog
+### Fase 3: Desarrollo Frontend - Blog ⏳
 
-1. Crear página de listado de posts
-2. Crear página de post individual
-3. Implementar sistema de comentarios
-4. Implementar categorías y tags
-5. Implementar búsqueda
-6. Optimizar SEO
+1. ⏳ Crear página de listado de posts
+   - Diseñar componente de tarjeta de post
+   - Implementar paginación
+   - Añadir filtros por categoría
+2. ⏳ Crear página de post individual
+   - Diseñar layout de post
+   - Implementar visualización de contenido rich text
+   - Añadir navegación entre posts
+3. ⏳ Implementar sistema de comentarios
+   - Crear formulario de comentarios
+   - Mostrar lista de comentarios
+   - Implementar respuestas a comentarios
+4. ⏳ Implementar categorías y tags
+   - Crear componente de navegación por categorías
+   - Implementar página de categoría
+5. ⏳ Implementar búsqueda
+   - Crear componente de búsqueda
+   - Implementar búsqueda en tiempo real
+6. ⏳ Optimizar SEO
+   - Configurar meta tags dinámicos
+   - Implementar sitemap
 
 ### Fase 4: Desarrollo Frontend - Shop
 
