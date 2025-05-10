@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -10,8 +10,8 @@ import Cart from './components/Cart';
 import { Product, CartItem } from './types';
 import { products } from './data/products';
 import { AuthProvider } from './context/AuthContext';
-
-
+import { initSupabaseIntegration } from './lib/supabase/client';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   // Initialize cart with one item
@@ -19,6 +19,19 @@ function App() {
     { product: products[0], quantity: 1 }
   ]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  
+  // Initialize Supabase integration when the app loads
+  useEffect(() => {
+    // Set up Supabase auth synchronization
+    const unsubscribe = initSupabaseIntegration();
+    
+    // Clean up on unmount
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
+  }, []);
 
   const addToCart = (product: Product) => {
     setCartItems(prevItems => {
@@ -55,6 +68,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <Toaster position="top-right" />
       <Helmet>
         <title>UI HUB - Digital Components and UI Resources</title>
         <meta name="description" content="Discover high-quality UI components, digital resources, and design inspiration for your next web project." />
