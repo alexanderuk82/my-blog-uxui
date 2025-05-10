@@ -48,31 +48,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signInWithGoogle = async () => {
-    try {
-      console.log('Initializing Google sign-in process');
-      const provider = new GoogleAuthProvider();
-      
-      // Add these scopes to ensure we get the user's profile information
-      provider.addScope('profile');
-      provider.addScope('email');
-      
-      // Set custom parameters for better browser compatibility
-      provider.setCustomParameters({
-        prompt: 'select_account'
-      });
-      
-      console.log('Using popup method for authentication');
-      const result = await signInWithPopup(auth, provider);
-      console.log('Google sign-in successful');
-      
-      // Store the email for future sign-ins
-      if (result.user?.email) {
-        localStorage.setItem('last_email', result.user.email);
-      }
-    } catch (error) {
-      console.error('Error during Google sign-in:', error);
-      throw error;
-    }
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
   };
 
   const resetPassword = async (email: string) => {
@@ -80,11 +57,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    // Limpiar cualquier estado de redirección pendiente que pudiera haber quedado
-    localStorage.removeItem('auth_redirect_in_progress');
-    localStorage.removeItem('use_popup_fallback');
-    
-    // Set up the auth state listener
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       setLoading(false);
