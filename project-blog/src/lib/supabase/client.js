@@ -6,8 +6,108 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import authService from '../../../../backend/supabase/services/auth';
-import databaseService from '../../../../backend/supabase/services/database';
+
+// En lugar de importar directamente los servicios del backend, vamos a crear
+// versiones simplificadas de estos servicios que funcionarán en Netlify
+
+// Servicios de autenticación simplificados
+const authService = {
+  // Función para verificar si un usuario es administrador
+  async checkAdminAccess(email) {
+    if (!email) return { data: null, error: new Error('Email is required') };
+    
+    // Crear una instancia de supabase para esta operación
+    const supabase = createClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY
+    );
+    
+    try {
+      // Consultar la tabla admin_users para verificar si el email está registrado
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('*')
+        .eq('email', email)
+        .single();
+      
+      if (error) throw error;
+      
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error checking admin access:', error);
+      return { data: null, error };
+    }
+  },
+  
+  // Función para sincronizar un usuario de Firebase con Supabase
+  async syncUserWithSupabase(firebaseUser) {
+    if (!firebaseUser) return { data: null, error: new Error('Firebase user is required') };
+    
+    // Crear una instancia de supabase para esta operación
+    const supabase = createClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY
+    );
+    
+    try {
+      // Verificar si el usuario ya existe en Supabase
+      const { data: existingUser, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('firebase_uid', firebaseUser.uid)
+        .maybeSingle();
+      
+      if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
+      
+      // Si el usuario no existe, crearlo
+      if (!existingUser) {
+        const { data: newUser, error: insertError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              firebase_uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              display_name: firebaseUser.displayName || '',
+              photo_url: firebaseUser.photoURL || '',
+              created_at: new Date().toISOString()
+            }
+          ])
+          .select()
+          .single();
+        
+        if (insertError) throw insertError;
+        
+        return { data: newUser, error: null };
+      }
+      
+      // Si el usuario existe, actualizar sus datos si es necesario
+      const { data: updatedUser, error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          email: firebaseUser.email,
+          display_name: firebaseUser.displayName || existingUser.display_name,
+          photo_url: firebaseUser.photoURL || existingUser.photo_url,
+          last_sign_in: new Date().toISOString()
+        })
+        .eq('firebase_uid', firebaseUser.uid)
+        .select()
+        .single();
+      
+      if (updateError) throw updateError;
+      
+      return { data: updatedUser, error: null };
+    } catch (error) {
+      console.error('Error syncing user with Supabase:', error);
+      return { data: null, error };
+    }
+  }
+};
+
+// Servicios de base de datos simplificados
+const databaseService = {
+  // Implementación básica para el entorno de producción
+  // Estas funciones se ampliarán según sea necesario
+};
 
 // Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
