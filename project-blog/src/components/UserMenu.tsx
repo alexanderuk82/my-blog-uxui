@@ -9,6 +9,7 @@ interface UserMenuProps {
   currentUser: any | null;
   onLoginClick: () => void;
   onLogoutClick: () => void;
+  onRegisterClick?: () => void;
 }
 
 const UserMenu: React.FC<UserMenuProps> = ({
@@ -17,7 +18,8 @@ const UserMenu: React.FC<UserMenuProps> = ({
   anchorRef,
   currentUser,
   onLoginClick,
-  onLogoutClick
+  onLogoutClick,
+  onRegisterClick
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -161,7 +163,13 @@ const UserMenu: React.FC<UserMenuProps> = ({
             <span>Sign In</span>
           </button>
           <button
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              // Asumimos que el componente padre pasará una función onRegisterClick
+              if (typeof onRegisterClick === 'function') {
+                onRegisterClick();
+              }
+            }}
             className="block w-full text-left px-4 py-2 text-sm hover:bg-surface focus:bg-surface focus:outline-none transition-colors"
             role="menuitem"
           >

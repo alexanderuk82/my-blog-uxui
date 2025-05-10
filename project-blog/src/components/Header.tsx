@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
-import { ShoppingCart, User } from 'lucide-react';
+import { ShoppingCart, User, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { CartItem } from '../types';
 import Login from './auth/Login';
+import SignUp from './auth/SignUp';
 import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
+import toast from 'react-hot-toast';
 
 interface HeaderProps {
   cartItems: CartItem[];
@@ -20,7 +22,14 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userButtonRef = useRef<HTMLButtonElement>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // Lista de correos electrónicos con acceso de administrador
+  const adminEmails = ['alexanderburgosuk82@gmail.com']; // Añade aquí tu correo electrónico
+  
+  // Verificar si el usuario actual tiene acceso de administrador
+  const isAdmin = currentUser && adminEmails.includes(currentUser.email || '');
 
   useEffect(() => {
     const updateTime = () => {
@@ -99,6 +108,16 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
                 <Link to="/blog" className="hover:underline focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none p-1 rounded-sm" aria-label="Read blog">Blog</Link>
                 <Link to="/about" className="hover:underline focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none p-1 rounded-sm" aria-label="About us">About</Link>
                 <Link to="/contact" className="hover:underline focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none p-1 rounded-sm" aria-label="Contact us">Contact</Link>
+                {isAdmin && (
+                  <Link 
+                    to="/admin" 
+                    className="flex items-center gap-1 text-primary hover:underline focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none p-1 rounded-sm" 
+                    aria-label="Admin panel"
+                  >
+                    <ShieldCheck size={16} aria-hidden="true" />
+                    <span>Admin</span>
+                  </Link>
+                )}
               </nav>
 
               {/* Mobile Menu */}
@@ -135,9 +154,14 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
                     {currentUser ? (
                       <div className="w-10 h-10 rounded-full bg-black text-white dark:bg-white dark:text-black flex items-center justify-center text-sm font-medium" aria-hidden="true">
                         {currentUser.email?.[0].toUpperCase()}
+                        {isAdmin && (
+                          <span className="absolute -top-1 -right-1 text-xs bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center" title="Admin">
+                            <ShieldCheck size={10} aria-hidden="true" />
+                          </span>
+                        )}
                       </div>
                     ) : (
-                      <User  aria-hidden="true" />
+                      <User aria-hidden="true" />
                     )}
                   </button>
                   
@@ -150,7 +174,14 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
                       setShowLoginModal(true);
                       setShowUserMenu(false);
                     }}
-                    onLogoutClick={logOut}
+                    onRegisterClick={() => {
+                      setShowSignUpModal(true);
+                      setShowUserMenu(false);
+                    }}
+                    onLogoutClick={() => {
+                      logOut();
+                      toast.success('Sesión cerrada correctamente');
+                    }}
                   />
                 </div>
               </div>
@@ -164,7 +195,22 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
           </div>
         </div>
       </header>
-      <Login isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <Login 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)} 
+        onSignUpClick={() => {
+          setShowLoginModal(false);
+          setShowSignUpModal(true);
+        }} 
+      />
+      <SignUp 
+        isOpen={showSignUpModal} 
+        onClose={() => setShowSignUpModal(false)} 
+        onLoginClick={() => {
+          setShowSignUpModal(false);
+          setShowLoginModal(true);
+        }} 
+      />
     </>
   );
 };

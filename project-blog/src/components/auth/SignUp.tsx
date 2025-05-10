@@ -1,58 +1,66 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Modal from '../ui/Modal';
-import { LogIn } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import { FirebaseError } from 'firebase/app';
 import toast from 'react-hot-toast';
 
-interface LoginProps {
+interface SignUpProps {
   isOpen: boolean;
   onClose: () => void;
-  onSignUpClick: () => void;
+  onLoginClick: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ isOpen, onClose, onSignUpClick }) => {
+const SignUp: React.FC<SignUpProps> = ({ isOpen, onClose, onLoginClick }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signInWithGoogle, resetPassword } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    
+
+    // Validate password match
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate password strength
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await signIn(email, password);
-      toast.success('Signed in successfully!');
+      await signUp(email, password);
+      toast.success('Account created successfully!');
       onClose();
     } catch (err) {
       if (err instanceof FirebaseError) {
         // Handle specific Firebase errors
         switch (err.code) {
+          case 'auth/email-already-in-use':
+            setError('This email is already registered');
+            toast.error('This email is already registered');
+            break;
           case 'auth/invalid-email':
             setError('Invalid email address');
             break;
-          case 'auth/user-disabled':
-            setError('This account has been disabled');
-            break;
-          case 'auth/user-not-found':
-            setError('No account found with this email');
-            break;
-          case 'auth/wrong-password':
-            setError('Incorrect password');
-            break;
-          case 'auth/too-many-requests':
-            setError('Too many failed login attempts. Please try again later');
+          case 'auth/weak-password':
+            setError('Password is too weak');
             break;
           default:
-            setError('Failed to sign in');
+            setError('Failed to create account');
         }
-        toast.error(error || 'Failed to sign in');
       } else {
         setError('An unexpected error occurred');
-        toast.error('An unexpected error occurred');
       }
     } finally {
       setIsLoading(false);
@@ -67,72 +75,40 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose, onSignUpClick }) => {
       onClose();
     } catch (err) {
       if (err instanceof FirebaseError) {
-        if (err.code === 'auth/popup-closed-by-user') {
-          // User closed the popup, no need to show error
-          setError('');
+        if (err.code === 'auth/account-exists-with-different-credential') {
+          toast.error('An account already exists with the same email address');
+          setError('An account already exists with the same email address');
         } else {
           setError('Failed to sign in with Google');
-          toast.error('Failed to sign in with Google');
         }
       } else {
         setError('An unexpected error occurred');
-        toast.error('An unexpected error occurred');
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!email) {
-      setError('Please enter your email address');
-      return;
-    }
-    
-    setIsLoading(true);
-    try {
-      await resetPassword(email);
-      toast.success('Password reset email sent!');
-      setError('');
-    } catch (err) {
-      if (err instanceof FirebaseError) {
-        if (err.code === 'auth/user-not-found') {
-          setError('No account found with this email');
-        } else if (err.code === 'auth/invalid-email') {
-          setError('Invalid email address');
-        } else {
-          setError('Failed to send password reset email');
-        }
-        toast.error(error || 'Failed to send password reset email');
-      } else {
-        setError('An unexpected error occurred');
-        toast.error('An unexpected error occurred');
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const switchToSignUp = () => {
+  const switchToLogin = () => {
     onClose();
-    onSignUpClick();
+    onLoginClick();
   };
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Sign In"
-      icon={<LogIn size={20} />}
+      title="Create Account"
+      icon={<UserPlus size={20} />}
     >
       {error && <p className="text-red-500 mb-4 text-sm" role="alert">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2" htmlFor="login-email">
+          <label className="block text-sm font-medium mb-2" htmlFor="signup-email">
             Email
           </label>
           <input
-            id="login-email"
+            id="signup-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -143,24 +119,31 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose, onSignUpClick }) => {
           />
         </div>
         <div>
-          <div className="flex justify-between items-center mb-2">
-            <label className="block text-sm font-medium" htmlFor="login-password">
-              Password
-            </label>
-            <button
-              type="button"
-              onClick={handleForgotPassword}
-              className="text-xs text-gray-500 hover:text-black dark:hover:text-white focus:outline-none"
-              disabled={isLoading}
-            >
-              Forgot password?
-            </button>
-          </div>
+          <label className="block text-sm font-medium mb-2" htmlFor="signup-password">
+            Password
+          </label>
           <input
-            id="login-password"
+            id="signup-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-800 border-keyline"
+            required
+            aria-required="true"
+            disabled={isLoading}
+            minLength={6}
+          />
+          <p className="text-xs text-gray-500 mt-1">Must be at least 6 characters</p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2" htmlFor="signup-confirm-password">
+            Confirm Password
+          </label>
+          <input
+            id="signup-confirm-password"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-800 border-keyline"
             required
             aria-required="true"
@@ -175,7 +158,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose, onSignUpClick }) => {
           {isLoading ? (
             <span className="inline-block w-5 h-5 border-2 border-white dark:border-black border-t-transparent dark:border-t-transparent rounded-full animate-spin mr-2"></span>
           ) : null}
-          Sign In
+          Create Account
         </button>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -201,14 +184,14 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose, onSignUpClick }) => {
           Google
         </button>
         <div className="text-center text-sm">
-          <span className="text-gray-500">Don't have an account?</span>{' '}
+          <span className="text-gray-500">Already have an account?</span>{' '}
           <button
             type="button"
-            onClick={switchToSignUp}
+            onClick={switchToLogin}
             className="text-black dark:text-white font-medium hover:underline focus:outline-none"
             disabled={isLoading}
           >
-            Sign Up
+            Sign In
           </button>
         </div>
       </form>
@@ -216,4 +199,4 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose, onSignUpClick }) => {
   );
 };
 
-export default Login;
+export default SignUp;
