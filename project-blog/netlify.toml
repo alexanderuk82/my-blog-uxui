@@ -1,6 +1,7 @@
 [build]
-  command = "npm run build"
+  command = "CI= npm run build"
   publish = "dist"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ./"
 
 [dev]
   command = "npm run dev"
@@ -14,3 +15,6 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps"
+  VITE_FIREBASE_AUTH_DOMAIN = "uihub-9f59a.firebaseapp.com"
+  VITE_FIREBASE_PROJECT_ID = "uihub-9f59a"
+  VITE_SUPABASE_URL = "https://idtnltcfcaxqbpemceki.supabase.co"
