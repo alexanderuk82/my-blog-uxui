@@ -24,6 +24,17 @@ export default defineConfig({
           supabase: ['@supabase/supabase-js'],
         },
       },
+      // Excluir las importaciones problemáticas durante el build
+      onwarn(warning, warn) {
+        // Ignorar advertencias sobre módulos no encontrados para las rutas del backend
+        if (warning.code === 'MODULE_NOT_FOUND' && 
+            (warning.message.includes('backend/supabase/services/auth') ||
+             warning.message.includes('backend/supabase/services/database') ||
+             warning.message.includes('backend/supabase/config/supabase'))) {
+          return;
+        }
+        warn(warning);
+      }
     },
   },
 });

@@ -2,12 +2,12 @@
  * Supabase Client Integration
  * 
  * This file provides a client-side integration with Supabase.
- * It imports the services from the backend and makes them available to the React components.
+ * It imports the services from the local services and makes them available to the React components.
  */
 
 import { createClient } from '@supabase/supabase-js';
-import authService from '../../../../backend/supabase/services/auth';
-import databaseService from '../../../../backend/supabase/services/database';
+import authService from '../../services/supabase/auth';
+import databaseService from '../../services/supabase/database';
 
 // Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
