@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Allow crawling of static assets
+Allow: /src/
+Allow: /public/
+Allow: /_app/
+Allow: /favicon.ico
+
+# Sitemap location (you can update this when you add a sitemap)
+Sitemap: https://alexander-blog-uxui.windsurf.build/sitemap.xml
+
+# Crawl-delay (optional, helps prevent server overload)
+Crawl-delay: 1
