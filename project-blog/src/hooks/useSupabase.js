@@ -12,7 +12,9 @@ import supabaseClient, {
   blogService,
   productService,
   profileService,
-  orderService
+  orderService,
+  categoryServiceClient,
+  featuredServiceClient
 } from '../lib/supabase/client';
 
 /**
@@ -86,6 +88,8 @@ export const useSupabase = () => {
     product: productService,
     profile: profileService,
     order: orderService,
+    category: categoryServiceClient,
+    featured: featuredServiceClient,
     
     // Helper functions
     refreshProfile: async () => {

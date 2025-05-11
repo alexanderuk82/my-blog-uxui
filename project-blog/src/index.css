@@ -2,26 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --color-surface: #ececec;
-  --color-background: #f1f1f1;
-  --color-text: #000;
-  --color-keyline: rgba(0, 0, 0, 0.1);
-}
 
-.dark {
-  --color-surface: #1a1a1a;
-  --color-background: #121212;
-  --color-text: #fff;
-  --color-keyline: rgba(255, 255, 255, 0.2);
-}
-
-body {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 500;
-  background-color: var(--color-background);
-  color: var(--color-text);
-}
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 900;
@@ -45,5 +26,35 @@ h1, h2, h3, h4, h5, h6 {
 
   .card-hover:hover {
     transform: none;
+  }
+}
+
+
+
+@layer base {
+  :root {
+    --color-surface: #ececec;
+    --color-background: #f1f1f1;
+    --color-text: #000;
+    --color-keyline: rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark {
+    --color-surface: #1a1a1a;
+    --color-background: #121212;
+    --color-text: #fff;
+    --color-keyline: rgba(255, 255, 255, 0.2);
+  }
+
+}
+
+
+@layer base {
+ 
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
   }
 }
