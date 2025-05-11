@@ -10,7 +10,7 @@ import supabase from '../../lib/supabase/supabase';
 /**
  * Blog Post Services
  */
-export const blogService = {
+const blogService = {
   /**
    * Get all blog posts with optional pagination
    * @param {number} page - Page number (starting from 1)
@@ -137,7 +137,7 @@ export const blogService = {
 /**
  * Product Services
  */
-export const productService = {
+const productService = {
   /**
    * Get all products with optional pagination
    * @param {number} page - Page number (starting from 1)
@@ -254,7 +254,7 @@ export const productService = {
 /**
  * User Profile Services
  */
-export const profileService = {
+const profileService = {
   /**
    * Get user profile by ID
    * @param {string} userId - The user ID
@@ -299,7 +299,7 @@ export const profileService = {
 /**
  * Order Services
  */
-export const orderService = {
+const orderService = {
   /**
    * Create a new order
    * @param {Object} orderData - The order data
@@ -347,9 +347,95 @@ export const orderService = {
   }
 };
 
-// Export all services
+/**
+ * Category Services
+ */
+const categoryService = {
+  /**
+   * Get all categories
+   * @returns {Promise} - Promise resolving to categories data
+   */
+  getCategories: async () => {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name');
+    
+    if (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
+    }
+    
+    return data;
+  },
+
+  /**
+   * Get a single category by ID
+   * @param {string} id - The category ID
+   * @returns {Promise} - Promise resolving to category data
+   */
+  getCategoryById: async (id) => {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) {
+      console.error(`Error fetching category with ID ${id}:`, error);
+      throw error;
+    }
+    
+    return data;
+  },
+};
+
+/**
+ * Featured Content Services
+ */
+const featuredService = {
+  /**
+   * Get featured posts
+   * @param {number} limit - Number of featured posts to return
+   * @returns {Promise} - Promise resolving to featured posts data
+   */
+  getFeaturedPosts: async (limit = 3) => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select(`
+        *,
+        categories(*),
+        author:profiles(*)
+      `)
+      .eq('featured', true)
+      .eq('published', true)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    
+    if (error) {
+      console.error('Error fetching featured posts:', error);
+      throw error;
+    }
+    
+    return data;
+  },
+};
+
+// Export individual services
+export {
+  blogService,
+  categoryService,
+  featuredService,
+  productService,
+  profileService,
+  orderService
+};
+
+// Export default service object
 export default {
   blog: blogService,
+  category: categoryService,
+  featured: featuredService,
   product: productService,
   profile: profileService,
   order: orderService

@@ -7,7 +7,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import authService from '../../services/supabase/auth';
-import databaseService from '../../services/supabase/database';
+import databaseService, { categoryService, featuredService } from '../../services/supabase/database';
 
 // Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -174,6 +174,37 @@ export const orderService = {
   }
 };
 
+/**
+ * Category services for React components
+ */
+export const categoryServiceClient = categoryService || {
+  /**
+   * Get all categories
+   */
+  getCategories: async () => {
+    return databaseService.category.getCategories();
+  },
+  
+  /**
+   * Get a single category by ID
+   */
+  getCategoryById: async (id) => {
+    return databaseService.category.getCategoryById(id);
+  }
+};
+
+/**
+ * Featured content services for React components
+ */
+export const featuredServiceClient = featuredService || {
+  /**
+   * Get featured posts
+   */
+  getFeaturedPosts: async (limit = 3) => {
+    return databaseService.featured.getFeaturedPosts(limit);
+  }
+};
+
 // Export all services and the Supabase client
 export default {
   supabase,
@@ -181,5 +212,7 @@ export default {
   blog: blogService,
   product: productService,
   profile: profileService,
-  order: orderService
+  order: orderService,
+  category: categoryServiceClient,
+  featured: featuredServiceClient
 };
