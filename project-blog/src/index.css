@@ -36,6 +36,7 @@ h1, h2, h3, h4, h5, h6 {
     --color-surface: #ececec;
     --color-background: #f1f1f1;
     --color-text: #000;
+    --color-heading: #000;
     --color-keyline: rgba(0, 0, 0, 0.1);
   }
   
@@ -43,9 +44,20 @@ h1, h2, h3, h4, h5, h6 {
     --color-surface: #1a1a1a;
     --color-background: #121212;
     --color-text: #fff;
+    --color-heading: #fff;
     --color-keyline: rgba(255, 255, 255, 0.2);
   }
 
+  /* Aplicar color de heading según el tema */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-heading);
+  }
+
+  /* Asegurar que el texto base use el color correcto */
+  body {
+    color: var(--color-text);
+    background-color: var(--color-background);
+  }
 }
 
 

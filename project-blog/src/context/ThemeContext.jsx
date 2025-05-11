@@ -28,8 +28,11 @@ export const ThemeProvider = ({ children }) => {
     return 'light';
   });
 
-  // Update body data-theme attribute when theme changes
+  // Update theme class and data attribute when theme changes
   useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
+    root.classList.add(theme);
     document.body.setAttribute('data-theme', theme);
     localStorage.setItem('ui-hub-theme', theme);
   }, [theme]);
