@@ -18,13 +18,22 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Supabase URL and Anon Key must be provided in environment variables');
 }
 
-// Crear una única instancia del cliente Supabase para ser utilizada en toda la aplicación
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
-});
+// Crear una única instancia del cliente Supabase
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export default supabase;
+// Función para actualizar el token de autenticación
+const updateSupabaseToken = async (user) => {
+  if (!user) return;
+  
+  try {
+    const token = await user.getIdToken();
+    await supabase.auth.setSession({
+      access_token: token,
+      refresh_token: ''
+    });
+  } catch (error) {
+    console.error('Error updating Supabase token:', error);
+  }
+};
+
+export { supabase, updateSupabaseToken };

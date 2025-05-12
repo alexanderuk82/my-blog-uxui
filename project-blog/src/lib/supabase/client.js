@@ -83,6 +83,13 @@ export const blogService = {
    */
   deletePost: async (id) => {
     return databaseService.blog.deletePost(id);
+  },
+
+  /**
+   * Get related posts for a blog post
+   */
+  getRelatedPosts: async (slug, limit = 4) => {
+    return databaseService.blog.getRelatedPosts(slug, limit);
   }
 };
 

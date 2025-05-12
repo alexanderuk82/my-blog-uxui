@@ -6,7 +6,7 @@
  */
 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import supabase from '../../lib/supabase/supabase';
+import { supabase } from '../../lib/supabase/supabase';
 
 /**
  * Synchronizes the Firebase user with Supabase

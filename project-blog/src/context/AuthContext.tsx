@@ -9,6 +9,7 @@ import {
   signInWithPopup,
   sendPasswordResetEmail
 } from 'firebase/auth';
+// Eliminamos la importación de supabase ya que no la necesitamos aquí
 import { auth } from '../config/firebase';
 
 interface AuthContextType {

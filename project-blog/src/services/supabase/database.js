@@ -5,7 +5,7 @@
  * It abstracts away the direct Supabase client calls to provide a cleaner API.
  */
 
-import supabase from '../../lib/supabase/supabase';
+import { supabase } from '../../lib/supabase/supabase';
 
 /**
  * Blog Post Services
@@ -126,11 +126,62 @@ const blogService = {
       .eq('id', id);
     
     if (error) {
-      console.error(`Error deleting post ${id}:`, error);
+      console.error(`Error deleting post with ID ${id}:`, error);
       throw error;
     }
     
     return true;
+  },
+
+  /**
+   * Get related posts for a blog post
+   * @param {string} slug - The post slug
+   * @param {number} limit - Number of related posts to return
+   * @returns {Promise} - Promise resolving to related posts data
+   */
+  getRelatedPosts: async (slug, limit = 4) => {
+    // First get the current post with its categories
+    const { data: currentPost, error: postError } = await supabase
+      .from('posts')
+      .select(`
+        id,
+        categories!posts_categories(id)
+      `)
+      .eq('slug', slug)
+      .single();
+    
+    if (postError) {
+      console.error(`Error fetching post with slug ${slug}:`, postError);
+      throw postError;
+    }
+
+    // Get category IDs from the current post
+    const categoryIds = currentPost.categories.map(cat => cat.id);
+
+    // Then get posts that share any of these categories, excluding the current post
+    const { data: relatedPosts, error: relatedError } = await supabase
+      .from('posts')
+      .select(`
+        id,
+        title,
+        slug,
+        excerpt,
+        featured_image,
+        categories!posts_categories(id, name),
+        published_at
+      `)
+      .eq('published', true)
+      .neq('id', currentPost.id)
+      .in('categories.id', categoryIds)
+      .order('published_at', { ascending: false })
+      .limit(limit);
+    
+    if (relatedError) {
+      console.error('Error fetching related posts:', relatedError);
+      throw relatedError;
+    }
+    
+    return relatedPosts;
   }
 };
 
