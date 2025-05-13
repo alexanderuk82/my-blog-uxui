@@ -19,7 +19,7 @@ import { Skeleton } from '../components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 
 // Hooks
-import useBlog from '../hooks/useBlog';
+import useFilteredPosts from '../hooks/useFilteredPosts';
 import useCategories from '../hooks/useCategories';
 import useFeatured from '../hooks/useFeatured';
 import useAds from '../hooks/useAds';
@@ -35,15 +35,21 @@ import { formatDate } from '../lib/blogUtils';
 const BlogPage = () => {
   // State for filters and search
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchInputValue, setSearchInputValue] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [activeFilter, setActiveFilter] = useState('latest');
   const [isSearching, setIsSearching] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   
-  // Get blog posts using the custom hook
-  const { usePosts } = useBlog();
-  const { data: postsData, isLoading, error } = usePosts(1, 20);
-  
+  // Get filtered posts using the new hook
+  const { data: postsData, isLoading, error } = useFilteredPosts({
+    searchQuery,
+    selectedCategory,
+    activeFilter,
+    page: 1,
+    limit: 20
+  });
+
   // Get categories using the custom hook
   const { useAllCategories } = useCategories();
   const { data: categoriesData, isLoading: categoriesLoading } = useAllCategories();
@@ -54,10 +60,6 @@ const BlogPage = () => {
   
   // Get sidebar ad
   const { data: sidebarAd, isLoading: adLoading } = useAds('sidebar');
-  
-  // Derived state
-  const [filteredPosts, setFilteredPosts] = useState([]);
-  const [popularPosts, setPopularPosts] = useState([]);
   
   // Empty cart for header
   const cartItems = [];
@@ -76,50 +78,11 @@ const BlogPage = () => {
     }))
   ];
   
-  // Filter posts when data, search query, or category changes
+  // Update status message when filters change
   useEffect(() => {
-    if (!postsData) return;
+    if (!postsData?.posts) return;
     
-    // Apply filters
-    let filtered = [...postsData];
-    
-    // Apply search filter
-    if (searchQuery) {
-      filtered = filtered.filter(post => 
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    // Apply category filter
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(post => {
-        // Check if post has categories array
-        if (!post.categories) return false;
-        
-        // Ensure we're working with an array
-        const postCategories = Array.isArray(post.categories) ? post.categories : [post.categories];
-        
-        // Check if any category in the post matches the selected category ID
-        return postCategories.some(cat => String(cat.id) === String(selectedCategory));
-      });
-    }
-    
-    // Apply sort filter
-    if (activeFilter === 'latest') {
-      filtered.sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
-    } else if (activeFilter === 'popular') {
-      filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
-    }
-    
-    setFilteredPosts(filtered);
-    
-    // Set popular posts (top 5 by views)
-    const popular = [...postsData].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
-    setPopularPosts(popular);
-    
-    // Update status message for screen readers
-    const resultCount = filtered.length;
+    const resultCount = postsData.posts.length;
     const categoryName = categories.find(cat => cat.id === selectedCategory)?.name || 'All Categories';
     let status = `Showing ${resultCount} article${resultCount !== 1 ? 's' : ''}`;
     
@@ -137,21 +100,24 @@ const BlogPage = () => {
     if (resultsSectionRef.current && (searchQuery || selectedCategory !== 'all')) {
       resultsSectionRef.current.focus();
     }
-  }, [postsData, searchQuery, selectedCategory, activeFilter]);
+  }, [postsData, searchQuery, selectedCategory, categories]);
   
-  // Handle search input change with debounce
+  // Manejar cambios en el input de búsqueda
   const handleSearchChange = (e) => {
     const value = e.target.value;
-    setSearchQuery(value);
+    setSearchInputValue(value);
     setIsSearching(true);
-    
-    // Simple debounce for search
+  };
+  
+  // Efecto para manejar el debounce de la búsqueda
+  useEffect(() => {
     const timeoutId = setTimeout(() => {
+      setSearchQuery(searchInputValue);
       setIsSearching(false);
-    }, 300);
+    }, 500);
     
     return () => clearTimeout(timeoutId);
-  };
+  }, [searchInputValue]);
   
   // Handle category selection
   const handleCategoryChange = (categoryId) => {
@@ -307,7 +273,7 @@ const BlogPage = () => {
                   ref={searchInputRef}
                   type="search"
                   placeholder="Search articles..."
-                  value={searchQuery}
+                  value={searchInputValue}
                   onChange={handleSearchChange}
                   className="pl-10 h-12 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-full"
                   aria-describedby="search-help"
@@ -438,67 +404,44 @@ const BlogPage = () => {
                       role="alert"
                       aria-live="polite"
                     >
-                      <p className="text-red-700 dark:text-red-300 mb-2">Error loading articles</p>
-                      <p className="text-sm text-red-600 dark:text-red-400 mb-4">{error}</p>
-                      <Button 
-                        variant="outline" 
-                        className="mt-4" 
-                        onClick={() => window.location.reload()}
-                      >
-                        Try Again
-                      </Button>
+                      <p className="text-red-700 dark:text-red-200">
+                        {error.message || 'Failed to load blog posts'}
+                      </p>
                     </div>
-                  ) : filteredPosts.length === 0 ? (
+                  ) : !postsData?.posts || postsData.posts.length === 0 ? (
                     // No results message
                     <div 
-                      className="p-8 text-center bg-gray-50 dark:bg-gray-800/50 rounded-lg"
-                      role="status"
-                      aria-live="polite"
+                      className="p-6 text-center bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                      role="alert"
                     >
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">
-                        No articles found matching your search.
+                      <p className="text-gray-700 dark:text-gray-300">
+                        No posts found matching your criteria
                       </p>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => {
-                          setSearchQuery('');
-                          setSelectedCategory('all');
-                          searchInputRef.current?.focus();
-                        }}
-                        className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                      >
-                        Clear Filters
-                      </Button>
                     </div>
                   ) : (
                     // Blog posts grid
-                    <>
-                      <h2 className="sr-only">
-                        {statusMessage}
-                      </h2>
-                      <motion.div 
-                        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                        role="feed"
-                        aria-label="Blog articles"
-                      >
-                        {filteredPosts.map((post, index) => (
-                          <BlogPostCard 
-                            key={post.id} 
-                            post={post} 
-                            variants={itemVariants}
-                            index={index}
-                          />
-                        ))}
-                      </motion.div>
-                    </>
+                    <motion.div 
+                      className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                      variants={containerVariants}
+                      initial="hidden"
+                      animate="visible"
+                      role="feed"
+                      aria-label="Blog articles"
+                    >
+                      {postsData.posts.map((post, index) => (
+                        <BlogPostCard 
+                          key={post.id} 
+                          post={post} 
+                          variants={itemVariants}
+                          index={index}
+                        />
+                      ))}
+                    </motion.div>
                   )}
                 </section>
                 
                 {/* Pagination - Simple version */}
-                {filteredPosts.length > 0 && (
+                {postsData?.posts?.length > 0 && (
                   <nav 
                     className="flex justify-center mt-12"
                     aria-label="Pagination navigation"
@@ -534,7 +477,7 @@ const BlogPage = () => {
                     
                     <nav aria-label="Popular articles">
                       <ul className="space-y-4">
-                        {popularPosts.map(post => (
+                        {postsData?.popular?.slice(0, 5).map(post => (
                           <li key={post.id}>
                             <Link 
                               to={`/blog/${post.slug}`} 

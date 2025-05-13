@@ -3,6 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Calendar, Share2, HandMetal, Linkedin, Mail, Copy, Check, Chrome } from 'lucide-react';
+import Login from '../components/auth/Login';
+import SignUp from '../components/auth/SignUp';
+import SimilarPosts from '../components/blog/SimilarPosts';
 import { Toaster, toast } from 'react-hot-toast';
 import Modal from '../components/ui/Modal';
 import { Button } from '@/components/ui/button';
@@ -36,7 +39,8 @@ const BlogPostPage = () => {
   const [showShare, setShowShare] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
   const { currentUser, signInWithGoogle } = useAuth();
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
   
 
   
@@ -63,7 +67,7 @@ const BlogPostPage = () => {
   const handleClap = async () => {
     try {
       if (!currentUser) {
-        setShowAuthDialog(true);
+        setShowLoginModal(true);
         return;
       }
 
@@ -76,16 +80,14 @@ const BlogPostPage = () => {
     } catch (error) {
       console.error('Error in handleClap:', error);
       if (error.message?.includes('sign in')) {
-        setShowAuthDialog(true);
+        setShowLoginModal(true);
       } else if (error.message?.includes('Maximum claps')) {
-        toast.error('Has alcanzado el máximo de aplausos para este post', {
-          duration: 3000,
-          position: 'bottom-right'
+        toast.error('You have reached the maximum claps for this post', {
+          duration: 3000
         });
       } else {
-        toast.error('No se pudo registrar tu aplauso. Por favor, intenta de nuevo.', {
-          duration: 3000,
-          position: 'bottom-right'
+        toast.error('Could not register your clap. Please try again.', {
+          duration: 3000
         });
       }
     } finally {
@@ -186,33 +188,53 @@ const BlogPostPage = () => {
         }}
       />
       <Helmet>
-        <title>{post?.title} - Alexander's Blog</title>
-        <meta name="description" content={post.excerpt} />
+        {/* Basic Meta Tags */}
+        <title>{post?.title} - UI HUB</title>
+        <meta name="description" content={post?.excerpt} />
+        <meta name="keywords" content={`${post?.tags?.join(', ')}, UI design, UX research, frontend development`} />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={`${post?.title} - UI HUB`} />
+        <meta property="og:description" content={post?.excerpt} />
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="UI HUB" />
+        <meta property="og:image" content={post?.coverImage} />
+        <meta property="article:published_time" content={post?.publishedAt} />
+        <meta property="article:author" content={post?.author?.name} />
+        {post?.tags?.map(tag => (
+          <meta property="article:tag" content={tag} key={tag} />
+        ))}
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${post?.title} - UI HUB`} />
+        <meta name="twitter:description" content={post?.excerpt} />
+        <meta name="twitter:image" content={post?.coverImage} />
+        <meta name="twitter:creator" content={post?.author?.twitter || '@uihub'} />
+
+        {/* Other */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
+        <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : ''} />
       </Helmet>
 
       {/* Auth Modal */}
-      <Modal
-        isOpen={showAuthDialog}
-        onClose={() => setShowAuthDialog(false)}
-        title="Sign in to continue"
-      >
-        <div className="space-y-4">
-          <p className="text-muted-foreground">
-            Sign in to save your claps and interact with posts.
-          </p>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setShowAuthDialog(false);
-              signInWithGoogle();
-            }}
-            className="w-full"
-          >
-            <Chrome className="mr-2 h-4 w-4" />
-            Continue with Google
-          </Button>
-        </div>
-      </Modal>
+      <Login 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)} 
+        onSignUpClick={() => {
+          setShowLoginModal(false);
+          setShowSignUpModal(true);
+        }} 
+      />
+      <SignUp
+        isOpen={showSignUpModal}
+        onClose={() => setShowSignUpModal(false)}
+        onLoginClick={() => {
+          setShowSignUpModal(false);
+          setShowLoginModal(true);
+        }}
+      />
 
       <div className="w-container mx-auto lg:mx-0 px-4 sm:px-8 md:px-content-x py-content-y bg-surface">
         <Header cartItems={[]} />
@@ -327,8 +349,8 @@ const BlogPostPage = () => {
                         size="icon"
                         className="rounded-full relative group"
                         onClick={handleClap}
-                        disabled={currentUser && userClaps >= 50}
-                        title={!currentUser ? 'Sign in to save your claps' : userClaps >= 50 ? 'Maximum claps reached' : `You've given ${userClaps} claps`}
+                        disabled={currentUser && userClaps > 0}
+                        title={!currentUser ? 'Sign in to clap for this post' : userClaps > 0 ? 'You already clapped for this post' : 'Clap for this post'}
                       >
                         <motion.div
                           animate={isClapping ? { scale: [1, 1.2, 1] } : {}}
@@ -343,11 +365,9 @@ const BlogPostPage = () => {
                           )}
                         </motion.div>
                       </Button>
-                      {post.claps > 0 && (
-                        <span className="text-sm text-muted-foreground">
-                          {totalClaps} total claps
-                        </span>
-                      )}
+                      <span className="text-sm text-muted-foreground">
+                        {totalClaps} {totalClaps === 1 ? 'clap' : 'claps'}
+                      </span>
                     </div>
 
                     <DropdownMenu>
@@ -378,6 +398,13 @@ const BlogPostPage = () => {
                   </div>
                 </div>
               </motion.div>
+
+
+              {/* Similar Posts Section */}
+              <SimilarPosts 
+                currentPostId={post?.id}
+                categoryId={post?.categories?.[0]?.category_id}
+              />
             </div>
           </div>
         </main>
