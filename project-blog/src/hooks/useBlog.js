@@ -48,7 +48,10 @@ const useBlog = () => {
         console.log('Fetching post with slug:', slug);
         const { data, error } = await supabase
           .from('posts')
-          .select('*')
+          .select(`
+            *,
+            categories:posts_categories(category:categories(*))
+          `)
           .eq('slug', slug)
           .single();
 

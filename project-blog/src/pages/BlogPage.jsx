@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { Search, Filter, Calendar, Tag, TrendingUp, ArrowRight, X, CheckCircle } from 'lucide-react';
+import { Search, Filter, Calendar, Tag, TrendingUp, ArrowRight, X, CheckCircle, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Components
@@ -725,30 +725,30 @@ const BlogPostCard = ({ post, variants, index }) => {
           />
           
           {post.categories && post.categories.length > 0 && (
-            <div className="absolute top-3 left-3">
-              <Badge 
-                className="bg-primary hover:bg-primary/90"
-                role="status"
-                aria-label={`Category: ${typeof post.categories[0] === 'string' 
-                  ? post.categories[0] 
-                  : post.categories[0]?.name || 'Category'}`}
-              >
-                {typeof post.categories[0] === 'string' 
-                  ? post.categories[0] 
-                  : post.categories[0]?.name || 'Category'}
-              </Badge>
+            <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+              {post.categories.map((categoryItem) => (
+                <Badge 
+                  key={categoryItem.category.id}
+                  className="bg-black/70 hover:bg-black/90 text-white shadow-sm backdrop-blur-sm border border-white/10 transition-all duration-200 text-xs font-medium px-2.5 py-1 rounded-md"
+                  role="status"
+                  aria-label={`Category: ${categoryItem.category.name}`}
+                >
+                  {categoryItem.category.name}
+                </Badge>
+              ))}
             </div>
           )}
         </div>
         
         <CardContent className="p-5 flex-grow">
           <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
-            <div className="flex items-center gap-1">
-              {post.author && (
-                <span aria-label={`Author: ${post.author.name || 'Anonymous'}`}>
-                  {post.author.name || 'Anonymous'}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
+                <User className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                <span className="text-gray-600 dark:text-gray-300" aria-label="Author: Admin">
+                  By Admin
                 </span>
-              )}
+              </div>
             </div>
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" aria-hidden="true" />

@@ -242,7 +242,7 @@ const BlogPostPage = () => {
           <div className="container relative">
             {/* Hero Section */}
             <motion.div
-              className="relative h-[60vh] rounded-lg overflow-hidden mb-8"
+              className="relative h-[400px] md:h-[600px] lg:h-[700px] rounded-lg overflow-hidden mb-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
@@ -254,7 +254,7 @@ const BlogPostPage = () => {
                     alt={post.title}
                     className="h-full w-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 </div>
               )}
               <div className="relative h-full flex items-end pb-16">
@@ -265,10 +265,10 @@ const BlogPostPage = () => {
                   animate="animate"
                 >
                   <motion.div variants={slideUp}>
-                    <Badge className="mb-4">{post.categories?.[0]?.name || 'Uncategorized'}</Badge>
+                    <Badge className="bg-black/70 hover:bg-black/90 text-white shadow-sm backdrop-blur-sm border border-white/10 transition-all duration-200 text-xs font-medium px-2.5 py-1 rounded-md mb-4">{post.categories?.[0]?.category?.name || 'Uncategorized'}</Badge>
                   </motion.div>
                   <motion.h1 
-                    className="text-4xl md:text-6xl font-bold tracking-tight leading-[100%]"
+                    className="text-4xl md:text-6xl font-bold tracking-tight leading-[100%] text-white"
                     variants={slideUp}
                   >
                     {post.title}
@@ -277,7 +277,7 @@ const BlogPostPage = () => {
                     className="flex items-center gap-4 text-muted-foreground"
                     variants={slideUp}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-white">
                       <Calendar className="h-4 w-4" />
                       {formatDate(post.created_at)}
                     </div>
