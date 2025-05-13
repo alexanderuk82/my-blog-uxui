@@ -12,12 +12,17 @@ import { products } from './data/products';
 import { AuthProvider } from './context/AuthContext';
 import { initSupabaseIntegration } from './lib/supabase/client';
 import { Toaster } from 'react-hot-toast';
+import useBlog from './hooks/useBlog';
 
 function App() {
   // Initialize cart with one item
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    { product: products[0], quantity: 1 }
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  
+  // Get latest post for og:image
+  const { usePosts } = useBlog();
+  const { data: posts } = usePosts(1, 1);
+  const latestPost = posts?.[0];
+
   const [isCartOpen, setIsCartOpen] = useState(false);
   
   // Initialize Supabase integration when the app loads
@@ -70,6 +75,7 @@ function App() {
     <AuthProvider>
       <Toaster position="top-right" />
       <Helmet>
+        {/* Basic Meta Tags */}
         <title>UI HUB - Digital Components and UI Resources</title>
         <meta name="description" content="Discover high-quality UI components, digital resources, and design inspiration for your next web project." />
         <meta name="keywords" content="UI components, digital resources, web design, UI kit, design system" />
@@ -77,18 +83,21 @@ function App() {
         {/* Open Graph */}
         <meta property="og:title" content="UI HUB - Digital Components and UI Resources" />
         <meta property="og:description" content="Discover high-quality UI components, digital resources, and design inspiration for your next web project." />
+        <meta property="og:image" content={latestPost?.featured_image || '/home-preview.jpg'} />
+        <meta property="og:url" content={window.location.href} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="UI HUB" />
         
-        {/* Twitter */}
+        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="UI HUB - Digital Components and UI Resources" />
         <meta name="twitter:description" content="Discover high-quality UI components, digital resources, and design inspiration for your next web project." />
+        <meta name="twitter:image" content={latestPost?.featured_image || '/home-preview.jpg'} />
 
-        {/* Otros */}
+        {/* Other */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
-        <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : ''} />
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
 
       <div className="min-h-screen bg-white dark:bg-black">

@@ -188,15 +188,18 @@ const BlogPostPage = () => {
         }}
       />
       <Helmet>
-        {/* Basic Meta Tags */}
-        <title>{post?.title} - UI HUB</title>
-        <meta name="description" content={post?.excerpt} />
-        <meta name="keywords" content={`${post?.tags?.join(', ')}, UI design, UX research, frontend development`} />
-        
-        {/* Open Graph */}
-        <meta property="og:title" content={`${post?.title} - UI HUB`} />
-        <meta property="og:description" content={post?.excerpt} />
+        <title>{post.title} - UI HUB</title>
+        <meta name="description" content={post.excerpt} />
+        <meta property="og:title" content={`${post.title} - UI HUB`} />
+        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:image" content={post.featured_image} />
+        <meta property="og:url" content={window.location.href} />
         <meta property="og:type" content="article" />
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:title" content={`${post.title} - UI HUB`} />
+        <meta property="twitter:description" content={post.excerpt} />
+        <meta property="twitter:image" content={post.featured_image} />
+        <meta name="keywords" content={`${post?.tags?.join(', ')}, UI design, UX research, frontend development`} />
         <meta property="og:site_name" content="UI HUB" />
         <meta property="og:image" content={post?.coverImage} />
         <meta property="article:published_time" content={post?.publishedAt} />

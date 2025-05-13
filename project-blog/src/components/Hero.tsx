@@ -1,45 +1,43 @@
 import React, { useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useSeo } from '../context/SeoContext';
-import { useQuery } from '@tanstack/react-query';
+import useBlog from '../hooks/useBlog';
 
-interface Post {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
+interface Category {
+  id: number;
+  name: string;
   slug: string;
-  publishedAt: string;
 }
 
-const Hero = () => {
+interface Post {
+  id: number;
+  title: string;
+  content: string;
+  featured_image: string;
+  slug: string;
+  created_at: string;
+  categories: Category[];
+  author: {
+    id: number;
+    name: string;
+    avatar_url?: string;
+  };
+}
+
+const Hero: React.FC = () => {
   const { updateMetaData } = useSeo();
   
-  // Fetch último post
-  const { data: latestPost, isLoading } = useQuery<Post>({
-    queryKey: ['latestPost'],
-    queryFn: async () => {
-      // TODO: Reemplazar con llamada real a Strapi
-      const response = await fetch('/api/posts/latest');
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json();
-    },
-    initialData: {
-      id: '1',
-      title: 'The Rise of Component-Driven Development',
-      description: 'We believe in building software that serves humans through thoughtful design, robust engineering, and ethical business practices.',
-      image: 'https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      slug: 'rise-of-component-driven-development',
-      publishedAt: new Date().toISOString()
-    }
-  });
+  // Fetch último post usando useBlog
+  const { usePosts } = useBlog();
+  const { data: posts, isLoading } = usePosts(1, 1);
+  const latestPost = posts?.[0] as Post | undefined;
 
   useEffect(() => {
     if (latestPost) {
       updateMetaData({
-        image: latestPost.image,
+        image: latestPost.featured_image,
         title: `${latestPost.title} - UI HUB`,
-        description: latestPost.description,
+        description: latestPost.content.substring(0, 129) + '...',
         type: 'article'
       });
     }
@@ -49,15 +47,31 @@ const Hero = () => {
     <section className="py-64 md:py-32">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
         <div className="md:col-span-8">
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-black mb-8 leading-none">
-            DIGITAL <br /> COMPONENT PHILOSOPHY.
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-black mb-8 leading-none uppercase">
+            {isLoading ? (
+              <div className="animate-pulse">
+                <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded-[20px] mb-2 w-3/4"></div>
+                <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded-[20px] w-4/5"></div>
+              </div>
+            ) : (
+              <>
+                {latestPost?.title && (
+                  <>
+                    {latestPost.title.substring(0, 10)}
+                    <br />
+                    {latestPost.title.substring(10, 30)}
+                    {latestPost.title.length > 30 && '...'}
+                  </>
+                )}
+              </>
+            )}
           </h1>
           <div className="w-full aspect-video bg-gray-200 overflow-hidden mb-8">
             {isLoading ? (
               <div className="w-full h-full animate-pulse bg-gray-300" />
             ) : (
               <img 
-                src={latestPost?.image} 
+                src={latestPost?.featured_image} 
                 alt={latestPost?.title} 
                 className="w-full h-full object-cover"
               />
@@ -67,16 +81,16 @@ const Hero = () => {
         
         <div className="md:col-span-4 flex flex-col justify-between">
           <div>
-            <p className="max-w-[32ch] mb-8">
-              {isLoading ? (
-                <div className="h-20 animate-pulse bg-gray-300 rounded" />
-              ) : (
-                latestPost?.description
-              )}
-            </p>
+            {isLoading ? (
+              <div className="h-20 animate-pulse bg-gray-300 rounded mb-8" />
+            ) : (
+              <p className="max-w-[32ch] mb-8">
+                {latestPost?.content?.substring(0, 129)}...
+              </p>
+            )}
             
             <div className="inline-block border border-black dark:border-white rounded-full text-xs px-4 py-1.5">
-              2025®
+              {latestPost?.categories?.[0]?.name || '2025®'}
             </div>
           </div>
           

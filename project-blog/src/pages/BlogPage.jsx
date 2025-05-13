@@ -194,25 +194,29 @@ const BlogPage = () => {
   return (
     <>
       <Helmet>
-        <title>Blog - UI HUB | UI/UX Design and Frontend Development Articles</title>
-        <meta name="description" content="Explore articles about UI/UX design, frontend development and the latest trends in web technologies. Learn from industry experts and improve your skills." />
-        <meta name="keywords" content="UI design, UX research, frontend development, React, Tailwind CSS, web accessibility, blog, tutorials" />
+        {/* Basic Meta Tags */}
+        <title>UI HUB - Blog</title>
+        <meta name="description" content="Explore the latest insights on UI/UX design and frontend development" />
+        <meta name="keywords" content="UI design, UX research, frontend development, React, Tailwind CSS" />
         
         {/* Open Graph */}
-        <meta property="og:title" content="UI HUB Blog | UI/UX Design and Frontend Development Articles" />
-        <meta property="og:description" content="Explore articles about UI/UX design, frontend development and the latest trends in web technologies. Learn from industry experts and improve your skills." />
+        <meta property="og:title" content="UI HUB - Blog" />
+        <meta property="og:description" content="Explore the latest insights on UI/UX design and frontend development" />
+        <meta property="og:image" content="/blog-preview.jpg" />
+        <meta property="og:url" content={window.location.href} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="UI HUB" />
         
-        {/* Twitter */}
+        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="UI HUB Blog | UI/UX Design and Frontend Development Articles" />
-        <meta name="twitter:description" content="Explore articles about UI/UX design, frontend development and the latest trends in web technologies. Learn from industry experts and improve your skills." />
-
+        <meta name="twitter:title" content="UI HUB - Blog" />
+        <meta name="twitter:description" content="Explore the latest insights on UI/UX design and frontend development" />
+        <meta name="twitter:image" content="/blog-preview.jpg" />
+        
         {/* Other */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
-        <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : ''} />
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
 
       <div className="min-h-screen bg-white dark:bg-black" onKeyDown={handleKeyDown}>
