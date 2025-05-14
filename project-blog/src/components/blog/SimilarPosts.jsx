@@ -45,7 +45,7 @@ const SimilarPosts = ({ currentPostId, categoryId }) => {
   }
 
   return (
-    <section className="mt-16">
+    <section className="my-12">
       <h2 className="text-2xl font-bold mb-6">Similar Posts</h2>
       <motion.div
         variants={container}
@@ -82,9 +82,14 @@ const SimilarPosts = ({ currentPostId, categoryId }) => {
                       className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {post.categories?.[0]?.category && (
-                      <Badge className="absolute top-4 left-4">
-                        {post.categories[0].category.name}
+                      <Badge 
+                        className="absolute top-4 left-4 bg-black/70 hover:bg-black/90 text-white shadow-sm backdrop-blur-sm border border-white/10 transition-all duration-200 text-xs font-medium px-2.5 py-1 rounded-md"
+                        role="status"
+                        aria-label={`Category: ${post.categories[0]?.category?.name}`}
+                      >
+                        {post.categories[0]?.category?.name}
                       </Badge>
+
                     )}
                   </div>
                   <CardContent className="p-5">

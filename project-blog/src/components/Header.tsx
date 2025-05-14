@@ -126,7 +126,7 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
                 onClose={() => setIsMobileMenuOpen(false)}
               />
               
-              <div className="flex items-center gap-4 mt-4 md:mt-0" role="group" aria-label="User actions">
+              <div className="flex items-center gap-4 mt-4 md:-mt-4 lg:-mt-0" role="group" aria-label="User actions">
                 <ThemeToggle />
                 <button
                   onClick={onCartClick}

@@ -292,7 +292,7 @@ const BlogPostPage = () => {
             {/* Content Section */}
             <div className="mx-auto">
               <motion.div
-                className="prose prose-lg dark:prose-invert px-10 mt-4"
+                className="prose prose-lg dark:prose-invert px-2 md:px-10 mt-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
@@ -402,6 +402,7 @@ const BlogPostPage = () => {
                 </div>
               </motion.div>
 
+              <Separator className="mt-9 mb-16 bg-keyline dark:bg-keyline-dark" />
 
               {/* Similar Posts Section */}
               <SimilarPosts 
