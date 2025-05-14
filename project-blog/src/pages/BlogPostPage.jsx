@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -119,6 +119,11 @@ const BlogPostPage = () => {
   // Get blog data using hooks
   const { usePost, useClaps } = useBlog();
   const { data: post, isLoading: postLoading } = usePost(slug);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [post?.id]);
+
   console.log('Post data:', post); // Log para depuración
   const { totalClaps = 0, userClaps = 0, addClap } = useClaps(post?.id);
 
