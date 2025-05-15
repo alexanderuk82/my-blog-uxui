@@ -9,6 +9,7 @@ import SupabaseTest from './pages/SupabaseTest';
 import Login from './pages/Login';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
+import ProductsPage from './pages/ProductsPage';
 
 /**
  * Application routes configuration
@@ -29,6 +30,7 @@ const AppRoutes = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
+            <Route path="/products" element={<ProductsPage />} />
             {/* Add more routes here as needed */}
           </Routes>
         </AuthProvider>

@@ -18,6 +18,21 @@ export default {
 			maxWidth: {
 				container: '1440px'
 			},
+			keyframes: {
+				gradient: {
+					'0%, 100%': {
+						'background-size': '200% 200%',
+						'background-position': 'left center'
+					},
+					'50%': {
+						'background-size': '200% 200%',
+						'background-position': 'right center'
+					}
+				}
+			},
+			animation: {
+				gradient: 'gradient 15s ease infinite'
+			},
 			padding: {
 				'content-x': '96px',
 				'content-y': '48px'
