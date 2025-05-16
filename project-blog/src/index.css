@@ -70,3 +70,14 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 500;
   }
 }
+
+/* Asegura que los elementos focusables tengan un estilo visible */
+:focus-visible {
+  outline: 2px solid #ef4444; /* red-500 */
+  outline-offset: 2px;
+}
+
+/* Oculta el outline en elementos que no deberían ser focusables */
+[aria-hidden="true"]:focus-visible {
+  outline: none;
+}
