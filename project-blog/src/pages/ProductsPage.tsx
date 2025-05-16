@@ -97,7 +97,7 @@ const ProductsPage = () => {
         <div className="relative mb-16 rounded-2xl overflow-hidden bg-black text-white dark:bg-white dark:text-black p-16">
           <div className="relative z-10">
             <motion.h1 
-              className="text-6xl sm:text-7xl font-black mb-6"
+              className="text-4xl md:text-7xl md:leading-[1.2] lg:leading-normal font-black mb-6 text-white dark:text-black"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -106,7 +106,7 @@ const ProductsPage = () => {
             </motion.h1>
             
             <motion.p 
-              className="text-xl max-w-2xl mb-8 opacity-80"
+              className="text-xl max-w-2xl mb-10 opacity-80 "
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -152,7 +152,7 @@ const ProductsPage = () => {
         </div>
 
         {/* Search and Filter Bar */}
-        <div className="sticky top-0 z-20 -mt-8 mb-16 bg-surface/80 backdrop-blur-xl rounded-full border border-keyline p-4">
+        <div className="sticky top-0 z-20  my-6 bg-surface/80 backdrop-blur-xl rounded-full border border-keyline p-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-grow">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
