@@ -3,31 +3,33 @@ import { Link } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
 import { ShoppingCart, User, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { CartItem } from '../types';
 import Login from './auth/Login';
 import SignUp from './auth/SignUp';
 import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
 import toast from 'react-hot-toast';
+import { useCart } from '../context/CartContext';
+import Cart from './Cart';
 
 interface HeaderProps {
-  cartItems: CartItem[];
-  onCartClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
+const Header: React.FC<HeaderProps> = () => {
   // Eliminamos el estado isDarkMode ya que ahora lo maneja ThemeToggle
   const [currentTime, setCurrentTime] = useState('');
   const { currentUser, logOut } = useAuth();
+  const { state, setCartOpen } = useCart();
+  const cartItemCount = state.itemCount;
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userButtonRef = useRef<HTMLButtonElement>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignUpModal, setShowSignUpModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
+
   // Lista de correos electrónicos con acceso de administrador
   const adminEmails = ['alexanderburgosuk82@gmail.com']; // Añade aquí tu correo electrónico
-  
+
   // Verificar si el usuario actual tiene acceso de administrador
   const isAdmin = currentUser ? adminEmails.includes(currentUser.email || '') : false;
 
@@ -47,13 +49,6 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
     
     return () => clearInterval(interval);
   }, []);
-  
-  // No necesitamos manejar el clic fuera del menú ni el resize aquí
-  // ya que ahora lo maneja el componente UserMenu
-  
-  // La funcionalidad de toggleDarkMode ahora está en el componente ThemeToggle
-
-  const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <>
@@ -128,15 +123,10 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
               
               <div className="flex items-center gap-4 mt-4 md:-mt-4 lg:-mt-0" role="group" aria-label="User actions">
                 <ThemeToggle />
-                <button
-                  onClick={onCartClick}
-                  className="p-2 rounded-full hover:bg-surface transition-colors relative focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none"
-                  aria-label={`Shopping cart${cartItemCount > 0 ? `, ${cartItemCount} ${cartItemCount === 1 ? 'item' : 'items'}` : ''}`}
-                  aria-haspopup="dialog"
-                >
-                  <ShoppingCart size={18} aria-hidden="true" />
+                <button onClick={() => setCartOpen(true)} className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full" aria-label="Open cart">
+                  <ShoppingCart size={20} />
                   {cartItemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-black text-white dark:bg-white dark:text-black text-xs rounded-full w-4 h-4 flex items-center justify-center" aria-hidden="true">
+                    <span className="absolute -top-1 -right-1 bg-black dark:bg-white text-white dark:text-black text-xs w-5 h-5 flex items-center justify-center rounded-full">
                       {cartItemCount}
                     </span>
                   )}
@@ -212,6 +202,7 @@ const Header: React.FC<HeaderProps> = ({ cartItems, onCartClick }) => {
           setShowLoginModal(true);
         }} 
       />
+      <Cart />
     </>
   );
 };

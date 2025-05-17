@@ -3,20 +3,21 @@ import { ShoppingCart, Tag, Info, Maximize2, Minimize2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Product } from '../types';
 import Modal from './ui/Modal';
+import { useCart } from '../context/CartContext';
+import { formatPrice } from '../utils/formatters';
 
 interface ProductDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   product: Product | null;
-  onAddToCart: (product: Product) => void;
 }
 
 const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ 
   isOpen, 
   onClose, 
-  product, 
-  onAddToCart 
+  product 
 }) => {
+  const { addItem } = useCart(); // Use useCart hook
   const [aspectRatio, setAspectRatio] = useState<'16:9' | '1:1'>('16:9');
   
   if (!product) return null;
@@ -34,7 +35,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             className={`overflow-hidden rounded-lg ${aspectRatio === '16:9' ? 'aspect-video' : 'aspect-square'} transition-all duration-300`}
           >
             <img 
-              src={product.image} 
+              src={product.image_url || '/placeholder-product.jpg'} 
               alt={product.name} 
               className="w-full h-full object-cover"
             />
@@ -77,12 +78,13 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           <div className="flex justify-between items-center pt-4 border-t border-keyline">
             <div className="flex flex-col">
               <span className="text-sm text-gray-600 dark:text-gray-400">Price</span>
-              <span className="text-2xl font-bold">${product.price}</span>
+              <span className="text-2xl font-bold">{formatPrice(product.price, product.currency)}</span>
             </div>
             
             <motion.button 
-              onClick={() => {
-                onAddToCart(product);
+              onClick={(e) => {
+                e.stopPropagation(); // Evitar que el evento se propague
+                addItem(product);
                 onClose();
               }}
               className="flex items-center gap-2 px-6 py-3 bg-black text-white dark:bg-white dark:text-black rounded-full hover:opacity-90 transition-all text-sm font-medium"

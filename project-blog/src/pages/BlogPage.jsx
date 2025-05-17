@@ -202,7 +202,7 @@ const BlogPage = () => {
         />
         <meta 
           name="keywords" 
-          content={`UI design, UX research, frontend development, React, Tailwind CSS, web development, ${posts?.map(post => post.tags?.join(', ')).join(', ')}, ${posts?.map(post => post.category).join(', ')}`}
+          content={`UI design, UX research, frontend development, React, Tailwind CSS, web development, ${postsData?.posts?.map(post => post.tags?.join(', ')).join(', ')}, ${postsData?.posts?.map(post => post.category).join(', ')}`}
         />
         
         {/* Open Graph */}
@@ -213,7 +213,7 @@ const BlogPage = () => {
         />
         <meta 
           property="og:image" 
-          content={posts?.[0]?.featured_image || '/assets/default-blog-preview.jpg'} 
+          content={postsData?.posts?.[0]?.featured_image || '/assets/default-blog-preview.jpg'} 
         />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:type" content="website" />
@@ -228,7 +228,7 @@ const BlogPage = () => {
         />
         <meta 
           name="twitter:image" 
-          content={posts?.[0]?.featured_image || '/assets/default-blog-preview.jpg'} 
+          content={postsData?.posts?.[0]?.featured_image || '/assets/default-blog-preview.jpg'} 
         />
         <meta name="twitter:creator" content="@uihub" />
         

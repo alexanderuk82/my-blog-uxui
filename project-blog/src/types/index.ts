@@ -1,10 +1,17 @@
 export interface Product {
-  id: number;
+  id: string;
   name: string;
-  description: string;
+  description?: string;
   price: number;
-  image: string;
+  currency: string;
+  image_url?: string;
   tags: string[];
+  is_free: boolean;
+  published: boolean;
+  stripe_product_id?: string;
+  stripe_price_id?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface BlogPost {
@@ -19,15 +26,6 @@ export interface BlogPost {
     name: string;
     avatar?: string;
   };
-}
-
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  tags: string[];
 }
 
 export interface CartItem {

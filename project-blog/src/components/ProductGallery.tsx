@@ -1,22 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Product } from '../types';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { ShoppingCart, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import ProductDetailModal from './ProductDetailModal';
+import { useCart } from '../context/CartContext';
+import useProducts, { Product } from '../hooks/useProducts';
+import { formatPrice } from '../utils/formatters';
 
-interface ProductGalleryProps {
-  products: Product[];
-  onAddToCart: (product: Product) => void;
-}
+// No need for props as we'll use useProducts hook
 
 // Componente de tarjeta de producto para el carrusel
 const ProductCard: React.FC<{ 
   product: Product; 
-  onAddToCart: (product: Product) => void;
   isActive?: boolean;
   index?: number;
   onClick: () => void;
-}> = ({ product, onAddToCart, isActive = false, index = 0, onClick }) => {
+}> = ({ product, isActive = false, index = 0, onClick }) => {
+  const { addItem } = useCart();
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   return (
     <motion.div 
       className={`relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 w-[280px] sm:w-[320px] md:w-[340px] h-[420px] cursor-pointer transition-all duration-300 ${isActive ? 'ring-2 ring-black dark:ring-white' : ''}`}
@@ -28,10 +29,15 @@ const ProductCard: React.FC<{
       layout
     >
       <div className="h-[55%] overflow-hidden relative group">
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+        )}
         <img 
-          src={product.image} 
-          alt={product.name} 
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          src={product.image_url || '/placeholder-product.jpg'} 
+          alt={product.name}
+          onLoad={() => setImageLoaded(true)}
+          style={{ opacity: imageLoaded ? 1 : 0 }}
+          className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
@@ -53,11 +59,13 @@ const ProductCard: React.FC<{
         </div>
         
         <div className="flex justify-between items-center">
-          <span className="font-bold text-xl">${product.price}</span>
+          <span className="font-bold text-xl">
+            {formatPrice(product.price, product.currency)}
+          </span>
           <motion.button 
             onClick={(e) => {
               e.stopPropagation();
-              onAddToCart(product);
+              addItem(product);
             }}
             className="flex items-center gap-2 px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded-full hover:opacity-90 transition-all text-sm"
             whileTap={{ scale: 0.95 }}
@@ -85,7 +93,7 @@ const ProductCard: React.FC<{
 };
 
 // Componente principal del carrusel moderno
-const ModernCarousel: React.FC<{ products: Product[]; onAddToCart: (product: Product) => void }> = ({ products, onAddToCart }) => {
+const ModernCarousel: React.FC<{ products: Product[] }> = ({ products }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
@@ -134,13 +142,14 @@ const ModernCarousel: React.FC<{ products: Product[]; onAddToCart: (product: Pro
   };
   
   // Manejar el arrastre del carrusel
-  const handleDragEnd = (e: any, { offset, velocity }: any) => {
+  const handleDragEnd = () => {
     setIsDragging(false);
     
     const swipeThreshold = 50;
-    if (offset.x < -swipeThreshold) {
+    if (x.get() < -swipeThreshold) {
       nextSlide();
-    } else if (offset.x > swipeThreshold) {
+    } else if (x.get() > swipeThreshold) {
+    } else if (x.get() > swipeThreshold) {
       prevSlide();
     }
     
@@ -216,7 +225,6 @@ const ModernCarousel: React.FC<{ products: Product[]; onAddToCart: (product: Pro
             <ProductCard
               key={product.id}
               product={product}
-              onAddToCart={onAddToCart}
               isActive={index === activeIndex}
               index={index}
               onClick={() => handleProductClick(product)}
@@ -228,8 +236,7 @@ const ModernCarousel: React.FC<{ products: Product[]; onAddToCart: (product: Pro
             <ProductCard
               key={`duplicate-${product.id}`}
               product={product}
-              onAddToCart={onAddToCart}
-              index={products.length + index}
+              index={index}
               onClick={() => handleProductClick(product)}
             />
           ))}
@@ -262,16 +269,42 @@ const ModernCarousel: React.FC<{ products: Product[]; onAddToCart: (product: Pro
           resumeAutoPlayAfterDelay();
         }}
         product={selectedProduct}
-        onAddToCart={onAddToCart}
       />
     </div>
   );
 };
 
 // Componente principal de la galería de productos
-const ProductGallery: React.FC<ProductGalleryProps> = ({ products, onAddToCart }) => {
+const ProductGallery: React.FC = () => {
+  const { products = [], isLoading, error } = useProducts();
+  const { addItem } = useCart();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="status" aria-label="Loading products">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="rounded-xl bg-white/50 dark:bg-zinc-800/50 border border-keyline p-4 h-[400px] animate-pulse">
+            <div className="w-full h-48 bg-zinc-200 dark:bg-zinc-700 rounded-lg mb-4" />
+            <div className="space-y-3">
+              <div className="h-6 w-2/3 bg-zinc-200 dark:bg-zinc-700 rounded" />
+              <div className="h-4 w-1/2 bg-zinc-200 dark:bg-zinc-700 rounded" />
+              <div className="h-10 w-full bg-zinc-200 dark:bg-zinc-700 rounded-lg mt-4" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12" role="alert">
+        <p className="text-red-500">Error loading products. Please try again later.</p>
+      </div>
+    );
+  }
   
   // Crear productos adicionales para el carrusel si no hay suficientes
   const extendedProducts = products.length >= 6 ? products : [
@@ -298,7 +331,7 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ products, onAddToCart }
         </div>
         
         {/* Carrusel moderno para todas las pantallas */}
-        <ModernCarousel products={extendedProducts} onAddToCart={onAddToCart} />
+        <ModernCarousel products={extendedProducts} />
         
         {/* Sección de productos destacados */}
         <div className="mt-16">
@@ -329,7 +362,7 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ products, onAddToCart }
               >
                 <div className="overflow-hidden h-48">
                   <img 
-                    src={product.image} 
+                    src={product.image_url || '/placeholder-product.jpg'} 
                     alt={product.name} 
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
@@ -350,9 +383,12 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ products, onAddToCart }
                   </div>
                   
                   <div className="flex justify-between items-center">
-                    <span className="font-bold">${product.price}</span>
+                    <p className="text-2xl font-bold mb-2">{formatPrice(product.price, product.currency)}</p>
                     <motion.button 
-                      onClick={() => onAddToCart(product)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Evitar que se abra el modal de detalles
+                        addItem(product);
+                      }}
                       className="flex items-center gap-2 px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded-full hover:opacity-90 transition-all text-sm"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -373,7 +409,6 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ products, onAddToCart }
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         product={selectedProduct}
-        onAddToCart={onAddToCart}
       />
     </section>
   );

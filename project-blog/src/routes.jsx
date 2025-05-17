@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import ProductsPage from './pages/ProductsPage';
+import ProductDetailPage from './pages/ProductDetailPage';
 
 /**
  * Application routes configuration
@@ -31,6 +32,7 @@ const AppRoutes = () => {
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/:slug" element={<ProductDetailPage />} />
             {/* Add more routes here as needed */}
           </Routes>
         </AuthProvider>

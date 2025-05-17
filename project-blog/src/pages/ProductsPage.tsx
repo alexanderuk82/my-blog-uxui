@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, X, SlidersHorizontal, Check, Sparkles } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '../components/ui/sheet';
@@ -15,22 +16,28 @@ import Footer from '../components/Footer';
 
 // UI Components
 
+// Utils
+import { formatPrice } from '../utils/formatters';
 
 // Context
-import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 // Hooks
 import useProducts, { Product } from '../hooks/useProducts';
 
 const ProductsPage = () => {
+  const navigate = useNavigate();
+
   // Estados
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
   const sheetRef = useRef(null);
   
-  // Datos de productos
+  // Hooks
+  const { addItem, setCartOpen } = useCart();
   const { products: allProducts, isLoading, error } = useProducts();
 
   // Obtener tags únicos de los productos
@@ -112,7 +119,7 @@ const ProductsPage = () => {
 
       <div className="w-container mx-auto lg:mx-0 px-4 sm:px-8 md:px-content-x py-content-y bg-surface">
       
-      <Header cartItems={[]} onCartClick={() => {}} />       
+      <Header />       
         
         {/* Hero Section */}
         <section 
@@ -491,10 +498,11 @@ const ProductsPage = () => {
                   className="group relative rounded-xl bg-white/50 dark:bg-zinc-800/50 border border-keyline overflow-hidden hover:shadow-xl hover:shadow-red-500/10 transition-all duration-500"
                   role="gridcell"
                   tabIndex={0}
+                  onClick={() => navigate(`/products/${product.id}`)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      // Aquí iría la acción al seleccionar el producto
+                      navigate(`/products/${product.id}`);
                     }
                   }}
                   initial={{ opacity: 0, y: 20 }}
@@ -526,15 +534,23 @@ const ProductsPage = () => {
                     
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-black">
-                        <span className="text-sm font-normal text-muted-foreground">{product.currency === 'usd' ? '$' : '£'}</span>
-                        {product.price}
+                        {formatPrice(Number(product.price), product.currency)}
                       </span>
                       <Button 
-                        onClick={() => {}}
-                        className="bg-red-500 text-white hover:bg-red-600 dark:bg-red-500 dark:text-white dark:hover:bg-red-600 font-medium shadow-lg shadow-red-500/20 dark:shadow-red-500/10 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus-visible:ring-offset-2"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setAddingToCart(product.id.toString());
+                          addItem(product);
+                          setCartOpen(true);
+                          // Resetear el estado después de un momento
+                          setTimeout(() => setAddingToCart(null), 1000);
+                        }}
+                        className={`relative bg-red-500 text-white hover:bg-red-600 dark:bg-red-500 dark:text-white dark:hover:bg-red-600 font-medium shadow-lg shadow-red-500/20 dark:shadow-red-500/10 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus-visible:ring-offset-2 ${addingToCart === product.id.toString() ? 'animate-pulse' : ''}`}
                         aria-label={`Add ${product.name} to cart`}
+                        disabled={addingToCart === product.id.toString()}
                       >
-                        Add to Cart
+                        {addingToCart === product.id.toString() ? 'Adding...' : 'Add to Cart'}
                       </Button>
                     </div>
                   </div>

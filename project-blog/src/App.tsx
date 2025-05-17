@@ -9,7 +9,7 @@ import Footer from './components/Footer';
 import Cart from './components/Cart';
 import { Product, CartItem } from './types';
 import { products } from './data/products';
-import { AuthProvider } from './context/AuthContext';
+
 import { initSupabaseIntegration } from './lib/supabase/client';
 import { Toaster } from 'react-hot-toast';
 import useBlog from './hooks/useBlog';
@@ -72,9 +72,9 @@ function App() {
   };
 
   return (
-    <AuthProvider>
-      <Toaster position="top-right" />
-      <Helmet>
+    <>
+        <Toaster position="top-right" />
+        <Helmet>
         {/* Basic Meta Tags */}
         <title>UI HUB - Digital Components and UI Resources</title>
         <meta name="description" content="Discover high-quality UI components, digital resources, and design inspiration for your next web project." />
@@ -92,32 +92,31 @@ function App() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="UI HUB - Digital Components and UI Resources" />
         <meta name="twitter:description" content="Discover high-quality UI components, digital resources, and design inspiration for your next web project." />
-        <meta name="twitter:image" content={latestPost?.featured_image || '/home-preview.jpg'} />
 
-        {/* Other */}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <link rel="canonical" href={window.location.href} />
-      </Helmet>
+          {/* Other */}
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <meta name="theme-color" content="#000000" />
+          <link rel="canonical" href={window.location.href} />
+        </Helmet>
 
-      <div className="min-h-screen bg-white dark:bg-black">
-        <div className="w-container mx-auto lg:mx-0 px-4 sm:px-8 md:px-content-x py-content-y bg-surface">
-          <Header cartItems={cartItems} onCartClick={() => setIsCartOpen(true)} />
-          <Hero />
-          <ValueProposition />
-          <ProductGallery products={products} onAddToCart={addToCart} />
-          <BlogTeaser />
-          <Footer />
-          <Cart
-            items={cartItems}
-            isOpen={isCartOpen}
-            onClose={() => setIsCartOpen(false)}
-            onUpdateQuantity={updateQuantity}
-            onRemoveItem={removeItem}
-          />
+        <div className="min-h-screen bg-white dark:bg-black">
+          <div className="w-container mx-auto lg:mx-0 px-4 sm:px-8 md:px-content-x py-content-y bg-surface">
+            <Header cartItems={cartItems} onCartClick={() => setIsCartOpen(true)} />
+            <Hero />
+            <ValueProposition />
+            <ProductGallery products={products} onAddToCart={addToCart} />
+            <BlogTeaser />
+            <Footer />
+            <Cart
+              items={cartItems}
+              isOpen={isCartOpen}
+              onClose={() => setIsCartOpen(false)}
+              onUpdateQuantity={updateQuantity}
+              onRemoveItem={removeItem}
+            />
+          </div>
         </div>
-      </div>
-    </AuthProvider>
+    </>
   );
 }
 

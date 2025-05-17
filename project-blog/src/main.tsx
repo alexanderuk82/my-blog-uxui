@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { SeoProvider } from './context/SeoContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { CartProvider } from './context/CartContext';
 import AppRoutes from './routes';
 import './index.css';
 
@@ -24,7 +25,9 @@ createRoot(document.getElementById('root')!).render(
         <HelmetProvider>
           <ThemeProvider>
             <SeoProvider>
-              <AppRoutes />
+              <CartProvider>
+                <AppRoutes />
+              </CartProvider>
             </SeoProvider>
           </ThemeProvider>
         </HelmetProvider>
