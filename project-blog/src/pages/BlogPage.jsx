@@ -195,23 +195,42 @@ const BlogPage = () => {
     <>
       <Helmet>
         {/* Basic Meta Tags */}
-        <title>UI HUB - Blog</title>
-        <meta name="description" content="Explore the latest insights on UI/UX design and frontend development" />
-        <meta name="keywords" content="UI design, UX research, frontend development, React, Tailwind CSS" />
+        <title>UI HUB - Blog | Latest UI/UX Design & Frontend Development Insights</title>
+        <meta 
+          name="description" 
+          content="Explore the latest insights on UI/UX design, frontend development, and web technologies. Expert articles, tutorials, and resources for modern web development." 
+        />
+        <meta 
+          name="keywords" 
+          content={`UI design, UX research, frontend development, React, Tailwind CSS, web development, ${posts?.map(post => post.tags?.join(', ')).join(', ')}, ${posts?.map(post => post.category).join(', ')}`}
+        />
         
         {/* Open Graph */}
-        <meta property="og:title" content="UI HUB - Blog" />
-        <meta property="og:description" content="Explore the latest insights on UI/UX design and frontend development" />
-        <meta property="og:image" content="/blog-preview.jpg" />
+        <meta property="og:title" content="UI HUB - Blog | Latest UI/UX Design & Frontend Development Insights" />
+        <meta 
+          property="og:description" 
+          content="Explore the latest insights on UI/UX design, frontend development, and web technologies. Expert articles, tutorials, and resources for modern web development." 
+        />
+        <meta 
+          property="og:image" 
+          content={posts?.[0]?.featured_image || '/assets/default-blog-preview.jpg'} 
+        />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="UI HUB" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="UI HUB - Blog" />
-        <meta name="twitter:description" content="Explore the latest insights on UI/UX design and frontend development" />
-        <meta name="twitter:image" content="/blog-preview.jpg" />
+        <meta name="twitter:title" content="UI HUB - Blog | Latest UI/UX Design & Frontend Development Insights" />
+        <meta 
+          name="twitter:description" 
+          content="Explore the latest insights on UI/UX design, frontend development, and web technologies. Expert articles, tutorials, and resources for modern web development." 
+        />
+        <meta 
+          name="twitter:image" 
+          content={posts?.[0]?.featured_image || '/assets/default-blog-preview.jpg'} 
+        />
+        <meta name="twitter:creator" content="@uihub" />
         
         {/* Other */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />

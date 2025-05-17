@@ -85,11 +85,29 @@ const ProductsPage = () => {
   return (
     <>
       <Helmet>
+        {/* Basic Meta Tags */}
         <title>UI Components Collection - Premium Design Resources</title>
-        <meta 
-          name="description" 
-          content="Premium design resources crafted for modern web applications. Build faster, design better with our UI components collection." 
-        />
+        <meta name="description" content="Premium design resources crafted for modern web applications. Build faster, design better with our UI components collection." />
+        <meta name="keywords" content={`UI components, design resources, web development, React components, ${allTags.join(', ')}, frontend development`} />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="UI Components Collection - Premium Design Resources" />
+        <meta property="og:description" content="Premium design resources crafted for modern web applications. Build faster, design better with our UI components collection." />
+        <meta property="og:image" content={allProducts?.[0]?.image_url || '/assets/default-products-preview.jpg'} />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="UI HUB" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="UI Components Collection - Premium Design Resources" />
+        <meta name="twitter:description" content="Premium design resources crafted for modern web applications. Build faster, design better with our UI components collection." />
+        <meta name="twitter:image" content={allProducts?.[0]?.image_url || '/assets/default-products-preview.jpg'} />
+        
+        {/* Other */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
 
       <div className="w-container mx-auto lg:mx-0 px-4 sm:px-8 md:px-content-x py-content-y bg-surface">
