@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { ShoppingCart, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import ProductDetailModal from './ProductDetailModal';
@@ -278,6 +279,7 @@ const ModernCarousel: React.FC<{ products: Product[] }> = ({ products }) => {
 const ProductGallery: React.FC = () => {
   const { products = [], isLoading, error } = useProducts();
   const { addItem } = useCart();
+  const navigate = useNavigate();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -341,6 +343,7 @@ const ProductGallery: React.FC = () => {
               className="text-sm font-medium underline-offset-4 hover:underline"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/products')}
             >
               View All Products
             </motion.button>
