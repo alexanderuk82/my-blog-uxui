@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShoppingCart, X, Plus, Minus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils/formatters';
+import StripeCheckout from './StripeCheckout';
 
 const Cart: React.FC = () => {
-  const { state, updateQuantity, removeItem, setCartOpen } = useCart();
+  const { state, updateQuantity, removeItem, setCartOpen, initiateCheckout } = useCart();
   const { items } = state;
   const total = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
 
   if (!state.isOpen) return null;
 
@@ -73,10 +75,25 @@ const Cart: React.FC = () => {
           </div>
           <button
             className="w-full bg-black text-white dark:bg-white dark:text-black py-2 rounded-full hover:opacity-90 transition-opacity disabled:opacity-50"
-            disabled={items.length === 0}
+            disabled={items.length === 0 || state.isCheckingOut}
+            onClick={async () => {
+              try {
+                const result = await initiateCheckout();
+                if (result?.sessionId) {
+                  setCheckoutSessionId(result.sessionId);
+                }
+              } catch (error) {
+                console.error('Error initiating checkout:', error);
+              }
+            }}
           >
-            Checkout
+            {state.isCheckingOut ? 'Processing...' : 'Checkout'}
           </button>
+          <StripeCheckout
+            sessionId={checkoutSessionId}
+            isLoading={state.isCheckingOut}
+            error={null}
+          />
         </div>
       </div>
     </div>

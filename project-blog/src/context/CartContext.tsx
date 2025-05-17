@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { Product } from '../types';
 
 // Types
-interface CartItem {
+export interface CartItem {
   product: Product;
   quantity: number;
 }
@@ -12,6 +12,8 @@ interface CartState {
   total: number;
   itemCount: number;
   isOpen: boolean;
+  isCheckingOut: boolean;
+  checkoutError?: string;
 }
 
 type CartAction =
@@ -19,7 +21,8 @@ type CartAction =
   | { type: 'REMOVE_ITEM'; payload: string }
   | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
   | { type: 'CLEAR_CART' }
-  | { type: 'SET_CART_OPEN'; payload: boolean };
+  | { type: 'SET_CART_OPEN'; payload: boolean }
+  | { type: 'SET_CHECKOUT_STATUS'; payload: { isCheckingOut: boolean; error?: string } };
 
 interface CartContextType {
   state: CartState;
@@ -28,6 +31,7 @@ interface CartContextType {
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   setCartOpen: (isOpen: boolean) => void;
+  initiateCheckout: () => Promise<{ sessionId: string; url: string; }>;
 }
 
 // Función para cargar el estado inicial desde localStorage
@@ -45,6 +49,8 @@ const loadInitialState = (): CartState => {
     total: 0,
     itemCount: 0,
     isOpen: false,
+    isCheckingOut: false,
+    checkoutError: undefined,
   };
 };
 
@@ -142,6 +148,14 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       };
       // No guardamos el estado isOpen en localStorage
       return newState;
+
+    case 'SET_CHECKOUT_STATUS':
+      newState = {
+        ...state,
+        isCheckingOut: action.payload.isCheckingOut,
+        checkoutError: action.payload.error,
+      };
+      return newState;
     
     default:
       return state;
@@ -162,6 +176,8 @@ interface CartProviderProps {
   children: ReactNode;
 }
 
+import { createCheckoutSession } from '../services/stripeService';
+
 export function CartProvider({ children }: CartProviderProps) {
   const [state, dispatch] = useReducer(cartReducer, initialState);
   
@@ -180,6 +196,32 @@ export function CartProvider({ children }: CartProviderProps) {
   const clearCart = () => dispatch({ type: 'CLEAR_CART' });
   const setCartOpen = (isOpen: boolean) => dispatch({ type: 'SET_CART_OPEN', payload: isOpen });
   
+  const initiateCheckout = async () => {
+    try {
+      dispatch({ 
+        type: 'SET_CHECKOUT_STATUS', 
+        payload: { isCheckingOut: true } 
+      });
+
+      const { url, sessionId } = await createCheckoutSession({
+        items: state.items,
+        successUrl: `${window.location.origin}/checkout/success`,
+        cancelUrl: `${window.location.origin}/checkout/cancel`,
+      });
+
+      return { sessionId, url };
+    } catch (error) {
+      console.error('Checkout error:', error);
+      dispatch({ 
+        type: 'SET_CHECKOUT_STATUS', 
+        payload: { 
+          isCheckingOut: false, 
+          error: error instanceof Error ? error.message : 'An error occurred during checkout' 
+        } 
+      });
+    }
+  };
+
   const value = {
     state,
     addItem,
@@ -187,6 +229,7 @@ export function CartProvider({ children }: CartProviderProps) {
     updateQuantity,
     clearCart,
     setCartOpen,
+    initiateCheckout,
   };
   
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
