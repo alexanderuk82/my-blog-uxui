@@ -1,6 +1,9 @@
 import { supabase } from '../lib/supabaseClient';
 import { CartItem } from '../context/CartContext';
 
+// Nota: Ya no necesitamos generar tokens en el frontend
+// Los tokens ahora se generan en el backend para mayor seguridad
+
 interface CreateCheckoutSessionParams {
   items: CartItem[];
   successUrl: string;
@@ -20,7 +23,7 @@ export async function createCheckoutSession({
     throw new Error('Success and cancel URLs are required');
   }
 
-  // Ensure URLs are absolute
+  // Ensure URLs are absolute (tokens will be added by the Edge Function)
   const baseUrl = window.location.origin;
   const fullSuccessUrl = successUrl.startsWith('http') ? successUrl : `${baseUrl}${successUrl}`;
   const fullCancelUrl = cancelUrl.startsWith('http') ? cancelUrl : `${baseUrl}${cancelUrl}`;
@@ -50,6 +53,7 @@ export async function createCheckoutSession({
     }
 
     // Transform cart items to line items using existing price IDs
+    // Asegurarnos de que los datos estén en el formato correcto que Stripe espera
     const lineItems = items.map(item => ({
       price: item.product.stripe_price_id,
       quantity: item.quantity,
@@ -58,15 +62,18 @@ export async function createCheckoutSession({
     // Log line items for debugging
     console.log('Line items:', JSON.stringify(lineItems, null, 2));
 
-    // Call the Edge Function
+    // Llamar a la función Edge original que estaba funcionando
+    const requestBody = {
+      line_items: lineItems,  // Usar snake_case para compatibilidad
+      success_url: fullSuccessUrl,
+      cancel_url: fullCancelUrl,
+      customer_email: user?.email || null
+    };
+    
+    console.log('Request body:', JSON.stringify(requestBody, null, 2));
+    
     const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-      body: {
-        lineItems,
-        successUrl: fullSuccessUrl,
-        cancelUrl: fullCancelUrl,
-        userId: user?.id, // Optional
-        customerEmail: user?.email, // Optional - Stripe recolectará el email
-      },
+      body: requestBody
     });
 
     if (error) throw error;

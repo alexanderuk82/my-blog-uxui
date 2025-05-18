@@ -13,6 +13,7 @@ import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CheckoutSuccessPage from './pages/CheckoutSuccessPage';
 import CheckoutCancelPage from './pages/CheckoutCancelPage';
+import InvalidCheckoutPage from './pages/InvalidCheckoutPage';
 
 /**
  * Application routes configuration
@@ -36,6 +37,7 @@ const AppRoutes = () => {
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
             <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
+            <Route path="/checkout/invalid" element={<InvalidCheckoutPage />} />
             <Route path="/products/:slug" element={<ProductDetailPage />} />
             {/* Add more routes here as needed */}
           </Routes>
